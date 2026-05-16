@@ -150,6 +150,11 @@ function ExploreObservatoryInner({
   /** Matches {@link vizEdgeDedupKey} for an edge chosen from the focus panel. */
   const [panelEdgeHighlightKey, setPanelEdgeHighlightKey] = useState<string | null>(null);
 
+  const setSelectedNodeId = useCallback((id: string | null) => {
+    setPanelEdgeHighlightKey(null);
+    setSelectedId(id);
+  }, []);
+
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
   const [bottomOpen, setBottomOpen] = useState(true);
@@ -231,10 +236,6 @@ function ExploreObservatoryInner({
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<SemanticFlowNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<SemanticFlowEdgeData>>([]);
-
-  useEffect(() => {
-    setPanelEdgeHighlightKey(null);
-  }, [selectedId]);
 
   useEffect(() => {
     const fid = effectiveFocusId ?? viz.nodeIds[0] ?? "";
@@ -334,10 +335,10 @@ function ExploreObservatoryInner({
       if (prev.length === 0) return prev;
       return prev.includes(id) ? prev : [...prev, id];
     });
-    setSelectedId(id);
+    setSelectedNodeId(id);
     setFocusId(id);
     setRightOpen(true);
-  }, []);
+  }, [setSelectedNodeId]);
 
   const handleNodeDoubleClick = useCallback(
     (id: string) => {
@@ -354,7 +355,7 @@ function ExploreObservatoryInner({
         if (sameFocus) {
           setExpandedRootIds([id]);
           setFocusId(id);
-          setSelectedId(id);
+          setSelectedNodeId(id);
           setRefitSignal((s) => s + 1);
           setRightOpen(false);
           return;
@@ -362,7 +363,7 @@ function ExploreObservatoryInner({
       }
       router.push(href);
     },
-    [index, router],
+    [index, router, setSelectedNodeId],
   );
 
   const toggleKind = useCallback((k: GraphEntityKind) => {
@@ -410,32 +411,31 @@ function ExploreObservatoryInner({
     if (urlFocusFromQuery && deepLinkSeedId) {
       setExpandedRootIds([deepLinkSeedId]);
       setFocusId(deepLinkSeedId);
-      setSelectedId(deepLinkSeedId);
+      setSelectedNodeId(deepLinkSeedId);
     } else {
       const home = exploreDefaultHomeFocalCanonicalId(index);
       if (home) {
         setExpandedRootIds([home]);
         setFocusId(home);
-        setSelectedId(home);
+        setSelectedNodeId(home);
       } else {
         setExpandedRootIds([]);
         setFocusId(defaultFocal);
-        setSelectedId(defaultFocal);
+        setSelectedNodeId(defaultFocal);
       }
     }
     setPathFromId(null);
     setPathToId(null);
-    setPanelEdgeHighlightKey(null);
-  }, [index, urlFocusFromQuery, deepLinkSeedId, defaultFocal]);
+  }, [index, urlFocusFromQuery, deepLinkSeedId, defaultFocal, setSelectedNodeId]);
 
   const surprise = useCallback(() => {
     const pick = pickRandomCanonicalId(index, kinds);
     if (pick == null) return;
     setExpandedRootIds([pick]);
     setFocusId(pick);
-    setSelectedId(pick);
+    setSelectedNodeId(pick);
     setRightOpen(true);
-  }, [index, kinds]);
+  }, [index, kinds, setSelectedNodeId]);
 
   const togglePin = useCallback((id: string) => {
     setPinned((prev) => {
@@ -642,7 +642,7 @@ function ExploreObservatoryInner({
               onEdgesChange={onEdgesChange}
               onNodeClick={handleNodeClick}
               onNodeDoubleClick={handleNodeDoubleClick}
-              onPaneClick={() => setSelectedId(null)}
+              onPaneClick={() => setSelectedNodeId(null)}
               onTidyLayout={handleTidyLayout}
             />
           </div>
