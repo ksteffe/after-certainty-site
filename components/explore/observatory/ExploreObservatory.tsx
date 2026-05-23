@@ -580,15 +580,12 @@ function ExploreObservatoryInner({
   const showCompactPanel =
     showCompactObservatory && (panelMode === "entity" || panelMode === "relationship");
 
-  const compactFocusSummary = useMemo(() => {
-    if (panelMode === "relationship" && relationshipSelection) {
-      return relationshipFocusSummary(index, relationshipSelection);
-    }
-    if (panelMode === "entity" && selectedNode) {
-      return entityFocusSummary(selectedNode);
-    }
-    return "";
-  }, [index, panelMode, relationshipSelection, selectedNode]);
+  let compactFocusSummary = "";
+  if (panelMode === "relationship" && relationshipSelection) {
+    compactFocusSummary = relationshipFocusSummary(index, relationshipSelection);
+  } else if (panelMode === "entity" && selectedNode) {
+    compactFocusSummary = entityFocusSummary(selectedNode);
+  }
 
   const flowCanvas = (
     <ExploreFlowCanvas
