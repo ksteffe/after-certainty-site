@@ -28,7 +28,6 @@ import {
   relatedPatternUrls,
 } from "@/lib/seo/json-ld";
 import { getConceptFullDefinition } from "@/lib/graph/conceptFormatting";
-import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -108,12 +107,6 @@ export default async function ExploreConceptDetailPage({ params }: PageProps) {
     ...relatedPatternUrls(index, concept.relatedPatterns),
     ...conceptRelationshipUrls(index, concept.id),
   ];
-  const reportContext = buildSemanticReportDisplayContext(graph, index, {
-    kind: "concept",
-    slug: concept.slug,
-    canonicalId: concept.id,
-    title: concept.title,
-  });
 
   return (
     <article>
@@ -140,7 +133,7 @@ export default async function ExploreConceptDetailPage({ params }: PageProps) {
           prev={prevConcept ? { slug: prevConcept.slug, title: prevConcept.title } : undefined}
           next={nextConcept ? { slug: nextConcept.slug, title: nextConcept.title } : undefined}
         />
-        <SemanticDataIssueReporter context={reportContext} />
+        <SemanticDataIssueReporter entityKind="concept" entitySlug={concept.slug} />
       </Section>
 
       {hasRelated ? (

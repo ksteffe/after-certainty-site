@@ -73,17 +73,6 @@ export type SemanticReportTrustedContext = {
   userAgent: string | null;
 };
 
-export type SemanticReportDisplayContext = {
-  entityType: GraphEntityKind;
-  entityTypeLabel: string;
-  entitySlug: string;
-  entityTitle: string;
-  pageUrl: string;
-  manifestVersion: string;
-  relationshipsPreview: string;
-  relationshipCount: number;
-};
-
 export type SemanticReportSuccessResponse = {
   ok: true;
   issueUrl: string;

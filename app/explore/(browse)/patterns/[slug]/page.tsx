@@ -21,7 +21,6 @@ import { relatedContentForPattern } from "@/lib/graph/relatedContent";
 import { getExploreSemanticGraph } from "@/lib/explore/exploreSemanticGraph";
 import { createPageMetadata } from "@/lib/metadata";
 import { buildPatternPageJsonLd, relatedConceptUrls } from "@/lib/seo/json-ld";
-import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -59,12 +58,6 @@ export default async function ExplorePatternDetailPage({ params }: PageProps) {
     { label: "Patterns", href: explorePaths.patterns },
     { label: pattern.title },
   ];
-  const reportContext = buildSemanticReportDisplayContext(graph, index, {
-    kind: "pattern",
-    slug: pattern.slug,
-    canonicalId: pattern.id,
-    title: pattern.title,
-  });
 
   return (
     <article>
@@ -92,7 +85,7 @@ export default async function ExplorePatternDetailPage({ params }: PageProps) {
           prev={prevPattern ? { slug: prevPattern.slug, title: prevPattern.title } : undefined}
           next={nextPattern ? { slug: nextPattern.slug, title: nextPattern.title } : undefined}
         />
-        <SemanticDataIssueReporter context={reportContext} />
+        <SemanticDataIssueReporter entityKind="pattern" entitySlug={pattern.slug} />
       </Section>
 
       {hasRelated ? (

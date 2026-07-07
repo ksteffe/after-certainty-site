@@ -4,15 +4,12 @@ import { useCallback, useId, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { exploreSecondaryButtonClass } from "@/components/explore/explore-action-buttons";
 import { cn } from "@/lib/cn";
-import {
-  ISSUE_TYPES,
-  ISSUE_TYPE_LABELS,
-  type IssueType,
-  type SemanticReportDisplayContext,
-} from "@/lib/semantic-report/types";
+import { ISSUE_TYPES, ISSUE_TYPE_LABELS, type IssueType } from "@/lib/semantic-report/types";
+import type { GraphEntityKind } from "@/types/semanticGraph";
 
 type SemanticDataIssueReporterProps = {
-  context: SemanticReportDisplayContext;
+  entityKind: GraphEntityKind;
+  entitySlug: string;
 };
 
 const fieldClassName =
@@ -40,7 +37,10 @@ const initialFormState: FormState = {
   evidence: "",
 };
 
-export function SemanticDataIssueReporter({ context }: SemanticDataIssueReporterProps) {
+export function SemanticDataIssueReporter({
+  entityKind,
+  entitySlug,
+}: SemanticDataIssueReporterProps) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(initialFormState);
   const [error, setError] = useState<string | null>(null);
@@ -76,8 +76,8 @@ export function SemanticDataIssueReporter({ context }: SemanticDataIssueReporter
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            entityKind: context.entityType,
-            entitySlug: context.entitySlug,
+            entityKind,
+            entitySlug,
             issueType: form.issueType,
             description: form.description,
             suggestedCorrection: form.suggestedCorrection || undefined,
@@ -101,7 +101,7 @@ export function SemanticDataIssueReporter({ context }: SemanticDataIssueReporter
         setSubmitting(false);
       }
     },
-    [context.entitySlug, context.entityType, form, submitting],
+    [entityKind, entitySlug, form, submitting],
   );
 
   return (
@@ -130,36 +130,6 @@ export function SemanticDataIssueReporter({ context }: SemanticDataIssueReporter
           Describe what looks wrong in the graph data for this entry. Your report is reviewed before
           any changes are made.
         </p>
-
-        <div className="mt-5 rounded-sm border border-border/35 bg-bg-elevated/30 p-4 text-sm text-muted">
-          <p className={labelClassName}>Trusted context</p>
-          <dl className="mt-3 space-y-2">
-            <div>
-              <dt className="text-xs uppercase tracking-[0.18em] text-muted/80">Entity</dt>
-              <dd className="text-fg">
-                {context.entityTypeLabel}: {context.entityTitle}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-[0.18em] text-muted/80">Slug</dt>
-              <dd className="font-mono text-xs text-fg/90">{context.entitySlug}</dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-[0.18em] text-muted/80">Page</dt>
-              <dd className="break-all text-xs text-fg/90">{context.pageUrl}</dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-[0.18em] text-muted/80">Manifest</dt>
-              <dd className="text-xs text-fg/90">v{context.manifestVersion}</dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-[0.18em] text-muted/80">Relationships</dt>
-              <dd className="whitespace-pre-wrap font-mono text-xs text-fg/80">
-                {context.relationshipsPreview}
-              </dd>
-            </div>
-          </dl>
-        </div>
 
         {successUrl ? (
           <div className="mt-5 rounded-sm border border-accent/30 bg-accent-soft/40 p-4 text-sm text-fg">

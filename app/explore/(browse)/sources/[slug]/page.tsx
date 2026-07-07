@@ -25,7 +25,6 @@ import {
   sourceDisplayTitle,
   thinkerHref,
 } from "@/lib/graph/sourceDisplay";
-import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 import { getExploreSemanticGraph } from "@/lib/explore/exploreSemanticGraph";
 import { createPageMetadata } from "@/lib/metadata";
 import { buildSourcePageJsonLd } from "@/lib/seo/json-ld";
@@ -72,12 +71,6 @@ export default async function ExploreSourceDetailPage({ params }: PageProps) {
     { label: "Sources", href: explorePaths.sources },
     { label: displayTitle },
   ];
-  const reportContext = buildSemanticReportDisplayContext(graph, index, {
-    kind: "source",
-    slug: source.slug,
-    canonicalId: source.id,
-    title: displayTitle,
-  });
 
   return (
     <article>
@@ -124,7 +117,7 @@ export default async function ExploreSourceDetailPage({ params }: PageProps) {
           prev={prevSource ? { slug: prevSource.slug, title: prevSource.name } : undefined}
           next={nextSource ? { slug: nextSource.slug, title: nextSource.name } : undefined}
         />
-        <SemanticDataIssueReporter context={reportContext} />
+        <SemanticDataIssueReporter entityKind="source" entitySlug={source.slug} />
       </Section>
 
       {hasRelated ? (

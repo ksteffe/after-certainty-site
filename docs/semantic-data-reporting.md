@@ -15,7 +15,7 @@ sequenceDiagram
   participant Graph as SemanticGraph
   participant GH as GitHubIssues
 
-  Page->>Modal: trusted display context (read-only)
+  Page->>Modal: entityKind, entitySlug
   Reader->>Modal: issue type, description, optional fields
   Modal->>API: entityKind, entitySlug, user observation
   API->>Graph: reload graph and verify entity
@@ -33,7 +33,7 @@ sequenceDiagram
 | API route          | `app/api/semantic-report/route.ts`                    | Validation, abuse controls, GitHub submission                |
 | Core logic         | `lib/semantic-report/*`                               | Sanitization, trusted context, issue formatting, rate limits |
 
-Entity detail pages pass **display-only** trusted context from the server. The API **rebuilds** trusted metadata from the live semantic graph using `entityKind` + `entitySlug` — the browser cannot override relationships, manifest version, or issue title.
+Entity detail pages pass `entityKind` and `entitySlug` to the reporter. The API **rebuilds** all trusted metadata from the live semantic graph — the browser never receives or displays relationships, manifest version, or other provenance fields.
 
 ## Security model
 

@@ -6,7 +6,6 @@ import {
   resolveEntityByKindAndSlug,
   serializeRelationshipsForEntity,
 } from "@/lib/semantic-report/build-context";
-import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 import type { SemanticGraph } from "@/types/semanticGraph";
 
 const miniGraph: SemanticGraph = {
@@ -74,20 +73,5 @@ describe("buildSemanticReportTrustedContext", () => {
     expect(trusted.manifestVersion).toBe("2");
     expect(trusted.pageUrl).toContain("/explore/concepts/certainty");
     expect(trusted.userAgent).toBe("vitest");
-  });
-});
-
-describe("buildSemanticReportDisplayContext", () => {
-  it("builds a preview with relationship count", () => {
-    const index = buildGraphIndex(miniGraph);
-    const display = buildSemanticReportDisplayContext(miniGraph, index, {
-      kind: "concept",
-      slug: "certainty",
-      canonicalId: "c1",
-      title: "Certainty",
-    });
-    expect(display.relationshipCount).toBe(1);
-    expect(display.entityTypeLabel).toBe("Concept");
-    expect(display.relationshipsPreview).toContain("[tension]");
   });
 });
