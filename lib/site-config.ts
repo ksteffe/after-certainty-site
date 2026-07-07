@@ -1,3 +1,5 @@
+import packageJson from "../package.json";
+
 /**
  * Canonical origin for metadata (`metadataBase`), RSS, and sitemaps.
  * Without `NEXT_PUBLIC_SITE_URL`, local dev defaults to localhost so `<link rel="icon">`
@@ -74,9 +76,12 @@ export function resolveSiteSocialLinks(): SiteSocialLinks {
   const gh = "https://github.com/ksteffe/after-certainty";
   return {
     github: process.env.NEXT_PUBLIC_SOCIAL_GITHUB_URL?.trim() || gh,
-    medium: process.env.NEXT_PUBLIC_SOCIAL_MEDIUM_URL?.trim() || "https://medium.com/@steffensen.kevin",
-    linkedIn: process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN_URL?.trim() || "https://www.linkedin.com/in/ksteffe/",
-    youtube: process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE_URL?.trim() || "https://www.youtube.com/@kstefftube",
+    medium:
+      process.env.NEXT_PUBLIC_SOCIAL_MEDIUM_URL?.trim() || "https://medium.com/@steffensen.kevin",
+    linkedIn:
+      process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN_URL?.trim() || "https://www.linkedin.com/in/ksteffe/",
+    youtube:
+      process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE_URL?.trim() || "https://www.youtube.com/@kstefftube",
   };
 }
 
@@ -89,7 +94,8 @@ export function resolvePodcastPlatformLinks(): PodcastPlatformLinks {
     apple: process.env.NEXT_PUBLIC_PODCAST_APPLE_URL?.trim() || "",
     youtube: process.env.NEXT_PUBLIC_PODCAST_YOUTUBE_URL?.trim() || "",
     rss: resolvePodcastRssUrl(),
-    githubDiscussions: process.env.NEXT_PUBLIC_GITHUB_DISCUSSIONS_URL?.trim() || `${gh}/discussions`,
+    githubDiscussions:
+      process.env.NEXT_PUBLIC_GITHUB_DISCUSSIONS_URL?.trim() || `${gh}/discussions`,
   };
 }
 
@@ -103,9 +109,21 @@ export function resolveGaMeasurementId(): string | null {
   return DEFAULT_GA_MEASUREMENT_ID;
 }
 
+/** Vercel deployment commit SHA when available (server-only). */
+export function resolveSiteBuildSha(): string | null {
+  const sha = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
+  return sha && sha.length > 0 ? sha : null;
+}
+
+/** Site package version for provenance in semantic data reports. */
+export function resolveSiteVersion(): string {
+  const envVersion = process.env.SITE_VERSION?.trim();
+  if (envVersion) return envVersion;
+  return packageJson.version;
+}
+
 /** Open Graph / Twitter card title (~50–60 chars for link preview tools). */
-export const OG_SHARE_TITLE =
-  "After Certainty — An Intellectual Commons for Human Systems";
+export const OG_SHARE_TITLE = "After Certainty — An Intellectual Commons for Human Systems";
 
 export const siteConfig = {
   name: "After Certainty",

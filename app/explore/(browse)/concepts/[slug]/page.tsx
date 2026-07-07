@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { BreadcrumbTrail } from "@/components/explore/breadcrumb-trail";
 import { ExploreEntityDetailActions } from "@/components/explore/explore-entity-detail-actions";
 import { ExploreAdjacentNav } from "@/components/explore/explore-adjacent-nav";
+import { SemanticDataIssueReporter } from "@/components/explore/semantic-data-issue-reporter";
 import { GraphNeighborhoodCards } from "@/components/explore/graph-neighborhood-cards";
 import { RelatedContentGrid } from "@/components/explore/related-content-grid";
 import { SemanticRelationshipsSection } from "@/components/explore/semantic-relationships-section";
@@ -27,6 +28,7 @@ import {
   relatedPatternUrls,
 } from "@/lib/seo/json-ld";
 import { getConceptFullDefinition } from "@/lib/graph/conceptFormatting";
+import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -106,6 +108,12 @@ export default async function ExploreConceptDetailPage({ params }: PageProps) {
     ...relatedPatternUrls(index, concept.relatedPatterns),
     ...conceptRelationshipUrls(index, concept.id),
   ];
+  const reportContext = buildSemanticReportDisplayContext(graph, index, {
+    kind: "concept",
+    slug: concept.slug,
+    canonicalId: concept.id,
+    title: concept.title,
+  });
 
   return (
     <article>
@@ -132,6 +140,7 @@ export default async function ExploreConceptDetailPage({ params }: PageProps) {
           prev={prevConcept ? { slug: prevConcept.slug, title: prevConcept.title } : undefined}
           next={nextConcept ? { slug: nextConcept.slug, title: nextConcept.title } : undefined}
         />
+        <SemanticDataIssueReporter context={reportContext} />
       </Section>
 
       {hasRelated ? (

@@ -22,26 +22,30 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Scripts
 
-| Command          | Purpose                          |
-| ---------------- | -------------------------------- |
-| `npm run dev`    | Local development                |
-| `npm run build`  | Production build                 |
-| `npm run start`  | Serve production build           |
-| `npm run lint`   | ESLint                           |
-| `npm run format` | Prettier write                   |
+| Command          | Purpose                |
+| ---------------- | ---------------------- |
+| `npm run dev`    | Local development      |
+| `npm run build`  | Production build       |
+| `npm run start`  | Serve production build |
+| `npm run lint`   | ESLint                 |
+| `npm run format` | Prettier write         |
 
 ## Environment
 
 Set **`NEXT_PUBLIC_SITE_URL`** to your canonical domain so metadata, Open Graph, RSS links, and `sitemap.xml` resolve correctly. Production: `https://www.after-certainty.com` (see `.env.example`).
 
+### Semantic data reporting
+
+Readers can report graph data issues from entity detail pages (`/explore/*/[slug]`). Reports are submitted to `POST /api/semantic-report` and become GitHub issues in the content repository. Configure `GITHUB_ISSUE_REPORT_TOKEN` in production. See [docs/semantic-data-reporting.md](docs/semantic-data-reporting.md) for architecture, security, and agent consumption guidance.
+
 ## Content architecture
 
-| Kind             | Location / notes                                             |
-| ---------------- | ------------------------------------------------------------ |
-| Typed models     | `types/content.ts`                                           |
-| Sample manifests | `data/*.json` — replace or sync from CI / books repo output    |
-| MDX pages        | `content/mdx/*.mdx`, imported from routes under `app/`          |
-| Site copy config | `lib/site-config.ts`                                          |
+| Kind             | Location / notes                                            |
+| ---------------- | ----------------------------------------------------------- |
+| Typed models     | `types/content.ts`                                          |
+| Sample manifests | `data/*.json` — replace or sync from CI / books repo output |
+| MDX pages        | `content/mdx/*.mdx`, imported from routes under `app/`      |
+| Site copy config | `lib/site-config.ts`                                        |
 
 Wire real manifests by swapping JSON under `data/` or pointing loaders in `lib/content-data.ts` at generated artifacts.
 

@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { BreadcrumbTrail } from "@/components/explore/breadcrumb-trail";
 import { ExploreEntityDetailActions } from "@/components/explore/explore-entity-detail-actions";
 import { ExploreAdjacentNav } from "@/components/explore/explore-adjacent-nav";
+import { SemanticDataIssueReporter } from "@/components/explore/semantic-data-issue-reporter";
 import { RelatedContentGrid } from "@/components/explore/related-content-grid";
 import { Section } from "@/components/ui/section";
 import {
@@ -17,6 +18,7 @@ import { getThinkerBySlug } from "@/lib/graph/graphQueries";
 import { relatedContentForThinker } from "@/lib/graph/relatedContent";
 import { createPageMetadata } from "@/lib/metadata";
 import { buildThinkerPageJsonLd } from "@/lib/seo/json-ld";
+import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 import type { Thinker } from "@/types/semanticGraph";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -65,6 +67,12 @@ export default async function ExploreThinkerDetailPage({ params }: PageProps) {
     { label: "Thinkers", href: explorePaths.thinkers },
     { label: thinker.name },
   ];
+  const reportContext = buildSemanticReportDisplayContext(graph, index, {
+    kind: "thinker",
+    slug: thinker.slug,
+    canonicalId: thinker.id,
+    title: thinker.name,
+  });
 
   return (
     <article>
@@ -102,6 +110,7 @@ export default async function ExploreThinkerDetailPage({ params }: PageProps) {
           prev={prevThinker ? { slug: prevThinker.slug, title: prevThinker.name } : undefined}
           next={nextThinker ? { slug: nextThinker.slug, title: nextThinker.name } : undefined}
         />
+        <SemanticDataIssueReporter context={reportContext} />
       </Section>
 
       {hasRelated ? (

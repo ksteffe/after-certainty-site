@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { ExploreBookMedia } from "@/components/explore/explore-book-media";
 import { ExploreEntityDetailActions } from "@/components/explore/explore-entity-detail-actions";
 import { ExploreAdjacentNav } from "@/components/explore/explore-adjacent-nav";
+import { SemanticDataIssueReporter } from "@/components/explore/semantic-data-issue-reporter";
 import { RelatedContentGrid } from "@/components/explore/related-content-grid";
 import { SemanticRelationshipsSection } from "@/components/explore/semantic-relationships-section";
 import { entityHasSemanticRelationships } from "@/lib/graph/relationshipTaxonomy";
@@ -28,6 +29,7 @@ import { resolveThinkersForBook } from "@/lib/graph/bookThinkers";
 import { getSemanticBookActionLinkItems } from "@/lib/books/semantic-book-action-links";
 import { createPageMetadata } from "@/lib/metadata";
 import { buildBookPageJsonLd, resolveCatalogBookForSemanticBook } from "@/lib/seo/json-ld";
+import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -93,6 +95,12 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
     { label: book.title },
   ];
   const catalogBook = resolveCatalogBookForSemanticBook(book, catalogBooks);
+  const reportContext = buildSemanticReportDisplayContext(graph, index, {
+    kind: "book",
+    slug: book.slug,
+    canonicalId: book.id,
+    title: book.title,
+  });
 
   return (
     <article>
@@ -152,6 +160,7 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
           prev={prevBook ? { slug: prevBook.slug, title: prevBook.title } : undefined}
           next={nextBook ? { slug: nextBook.slug, title: nextBook.title } : undefined}
         />
+        <SemanticDataIssueReporter context={reportContext} />
       </Section>
 
       {hasRelated ? (

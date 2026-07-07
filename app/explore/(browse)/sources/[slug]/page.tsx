@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { BreadcrumbTrail } from "@/components/explore/breadcrumb-trail";
 import { ExploreEntityDetailActions } from "@/components/explore/explore-entity-detail-actions";
 import { ExploreAdjacentNav } from "@/components/explore/explore-adjacent-nav";
+import { SemanticDataIssueReporter } from "@/components/explore/semantic-data-issue-reporter";
 import { RelatedContentGrid } from "@/components/explore/related-content-grid";
 import { SemanticRelationshipsSection } from "@/components/explore/semantic-relationships-section";
 import { entityHasSemanticRelationships } from "@/lib/graph/relationshipTaxonomy";
@@ -24,6 +25,7 @@ import {
   sourceDisplayTitle,
   thinkerHref,
 } from "@/lib/graph/sourceDisplay";
+import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 import { getExploreSemanticGraph } from "@/lib/explore/exploreSemanticGraph";
 import { createPageMetadata } from "@/lib/metadata";
 import { buildSourcePageJsonLd } from "@/lib/seo/json-ld";
@@ -70,6 +72,12 @@ export default async function ExploreSourceDetailPage({ params }: PageProps) {
     { label: "Sources", href: explorePaths.sources },
     { label: displayTitle },
   ];
+  const reportContext = buildSemanticReportDisplayContext(graph, index, {
+    kind: "source",
+    slug: source.slug,
+    canonicalId: source.id,
+    title: displayTitle,
+  });
 
   return (
     <article>
@@ -116,6 +124,7 @@ export default async function ExploreSourceDetailPage({ params }: PageProps) {
           prev={prevSource ? { slug: prevSource.slug, title: prevSource.name } : undefined}
           next={nextSource ? { slug: nextSource.slug, title: nextSource.name } : undefined}
         />
+        <SemanticDataIssueReporter context={reportContext} />
       </Section>
 
       {hasRelated ? (

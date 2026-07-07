@@ -5,11 +5,15 @@ import { BreadcrumbTrail } from "@/components/explore/breadcrumb-trail";
 import { ExplorePatternMedia } from "@/components/explore/explore-pattern-media";
 import { ExploreEntityDetailActions } from "@/components/explore/explore-entity-detail-actions";
 import { ExploreAdjacentNav } from "@/components/explore/explore-adjacent-nav";
+import { SemanticDataIssueReporter } from "@/components/explore/semantic-data-issue-reporter";
 import { RelatedContentGrid } from "@/components/explore/related-content-grid";
 import { SemanticRelationshipsSection } from "@/components/explore/semantic-relationships-section";
 import { entityHasSemanticRelationships } from "@/lib/graph/relationshipTaxonomy";
 import { Section } from "@/components/ui/section";
-import { explorePatternAdjacentInIndexOrder, patternsSortedForExploreIndex } from "@/lib/explore/explore-patterns-order";
+import {
+  explorePatternAdjacentInIndexOrder,
+  patternsSortedForExploreIndex,
+} from "@/lib/explore/explore-patterns-order";
 import { explorePaths } from "@/lib/graph/explorePaths";
 import { buildGraphIndex } from "@/lib/graph/graph";
 import { getPatternBySlug } from "@/lib/graph/graphQueries";
@@ -17,6 +21,7 @@ import { relatedContentForPattern } from "@/lib/graph/relatedContent";
 import { getExploreSemanticGraph } from "@/lib/explore/exploreSemanticGraph";
 import { createPageMetadata } from "@/lib/metadata";
 import { buildPatternPageJsonLd, relatedConceptUrls } from "@/lib/seo/json-ld";
+import { buildSemanticReportDisplayContext } from "@/lib/semantic-report/display-context";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -54,6 +59,12 @@ export default async function ExplorePatternDetailPage({ params }: PageProps) {
     { label: "Patterns", href: explorePaths.patterns },
     { label: pattern.title },
   ];
+  const reportContext = buildSemanticReportDisplayContext(graph, index, {
+    kind: "pattern",
+    slug: pattern.slug,
+    canonicalId: pattern.id,
+    title: pattern.title,
+  });
 
   return (
     <article>
@@ -70,7 +81,9 @@ export default async function ExplorePatternDetailPage({ params }: PageProps) {
         <h1 className="mt-4 font-display text-4xl font-medium leading-[1.08] tracking-tight text-fg md:text-5xl">
           {pattern.title}
         </h1>
-        <p className="mt-10 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">{pattern.summary}</p>
+        <p className="mt-10 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
+          {pattern.summary}
+        </p>
         <ExploreEntityDetailActions observatory={{ kind: "pattern", slug: pattern.slug }} />
         <ExplorePatternMedia pattern={pattern} />
         <ExploreAdjacentNav
@@ -79,10 +92,14 @@ export default async function ExplorePatternDetailPage({ params }: PageProps) {
           prev={prevPattern ? { slug: prevPattern.slug, title: prevPattern.title } : undefined}
           next={nextPattern ? { slug: nextPattern.slug, title: nextPattern.title } : undefined}
         />
+        <SemanticDataIssueReporter context={reportContext} />
       </Section>
 
       {hasRelated ? (
-        <Section atmosphere="transition" className="border-t border-border/25 !pt-8 md:!pt-10 !pb-14 md:!pb-20">
+        <Section
+          atmosphere="transition"
+          className="border-t border-border/25 !pt-8 md:!pt-10 !pb-14 md:!pb-20"
+        >
           <div className="flex flex-col gap-14">
             <RelatedContentGrid heading="Related concepts" concepts={related.concepts} />
             <RelatedContentGrid
@@ -95,7 +112,10 @@ export default async function ExplorePatternDetailPage({ params }: PageProps) {
       ) : null}
 
       {hasRelationships ? (
-        <Section atmosphere="none" className="border-t border-border/25 !pt-10 md:!pt-14 !pb-20 md:!pb-28">
+        <Section
+          atmosphere="none"
+          className="border-t border-border/25 !pt-10 md:!pt-14 !pb-20 md:!pb-28"
+        >
           <SemanticRelationshipsSection
             index={index}
             focalCanonicalId={pattern.id}
