@@ -13,6 +13,13 @@ import {
 const SUGGESTION_LIMIT = 8;
 const QUERY_DEBOUNCE_MS = 250;
 
+const opaquePanelStyle = {
+  backgroundColor: "var(--bg-elevated)",
+  opacity: 1,
+  mixBlendMode: "normal" as const,
+  isolation: "isolate" as const,
+};
+
 type ExploreIndexSearchProps = {
   items: readonly ExploreIndexItem[];
   /** Initial query from the server (`?q=`). */
@@ -51,6 +58,8 @@ function ExploreIndexSearchInner({
     query.trim().length === 0
       ? []
       : filterExploreIndexItems(items, query).slice(0, SUGGESTION_LIMIT);
+
+  const showSuggestions = open && suggestions.length > 0;
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -106,7 +115,7 @@ function ExploreIndexSearchInner({
   }
 
   return (
-    <form className="relative z-30 isolate max-w-xl" role="search" onSubmit={onSubmit}>
+    <form className="relative max-w-xl" role="search" onSubmit={onSubmit}>
       <label
         htmlFor={`${listboxId}-input`}
         className="text-[10px] uppercase tracking-[0.28em] text-muted"
@@ -121,7 +130,7 @@ function ExploreIndexSearchInner({
         autoComplete="off"
         aria-autocomplete="list"
         aria-controls={listboxId}
-        aria-expanded={open && suggestions.length > 0}
+        aria-expanded={showSuggestions}
         aria-activedescendant={
           activeIndex >= 0 && suggestions[activeIndex]
             ? `${listboxId}-option-${suggestions[activeIndex]!.id}`
@@ -140,24 +149,28 @@ function ExploreIndexSearchInner({
         }}
         onKeyDown={onKeyDown}
       />
-      {open && suggestions.length > 0 ? (
+      {showSuggestions ? (
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-sm border border-border bg-[var(--bg)] py-1 text-fg shadow-[0_12px_40px_rgba(0,0,0,0.75)]"
+          className="relative z-10 mt-1 max-h-72 w-full overflow-auto rounded-sm border border-border py-1 text-fg shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
+          style={opaquePanelStyle}
         >
           {suggestions.map((item, index) => (
-            <li key={item.id} role="presentation" className="bg-[var(--bg)]">
+            <li key={item.id} role="presentation" style={opaquePanelStyle}>
               <Link
                 id={`${listboxId}-option-${item.id}`}
                 role="option"
                 aria-selected={index === activeIndex}
                 href={item.href}
                 className={`block px-4 py-2.5 text-sm transition-colors ${
-                  index === activeIndex
-                    ? "bg-accent-soft text-accent"
-                    : "bg-[var(--bg)] text-fg hover:bg-accent-soft hover:text-accent"
+                  index === activeIndex ? "text-accent" : "text-fg hover:text-accent"
                 }`}
+                style={
+                  index === activeIndex
+                    ? { backgroundColor: "var(--accent-soft)", opacity: 1, mixBlendMode: "normal" }
+                    : opaquePanelStyle
+                }
                 onMouseDown={(e) => e.preventDefault()}
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => {
