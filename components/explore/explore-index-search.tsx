@@ -106,7 +106,7 @@ function ExploreIndexSearchInner({
   }
 
   return (
-    <form className="relative max-w-xl" role="search" onSubmit={onSubmit}>
+    <form className="relative z-30 isolate max-w-xl" role="search" onSubmit={onSubmit}>
       <label
         htmlFor={`${listboxId}-input`}
         className="text-[10px] uppercase tracking-[0.28em] text-muted"
@@ -128,7 +128,7 @@ function ExploreIndexSearchInner({
             : undefined
         }
         role="combobox"
-        className="mt-2 w-full rounded-sm border border-border/80 bg-bg-elevated/60 px-4 py-3 text-sm text-fg placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="mt-2 w-full rounded-sm border border-border/80 bg-bg-elevated px-4 py-3 text-sm text-fg placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         onChange={(e) => {
           setQuery(e.target.value);
           setOpen(true);
@@ -144,10 +144,10 @@ function ExploreIndexSearchInner({
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-sm border border-border/80 bg-bg-elevated py-1 shadow-lg"
+          className="absolute z-50 mt-1 max-h-72 w-full overflow-auto rounded-sm border border-border bg-[var(--bg)] py-1 text-fg shadow-[0_12px_40px_rgba(0,0,0,0.75)]"
         >
           {suggestions.map((item, index) => (
-            <li key={item.id} role="presentation">
+            <li key={item.id} role="presentation" className="bg-[var(--bg)]">
               <Link
                 id={`${listboxId}-option-${item.id}`}
                 role="option"
@@ -156,7 +156,7 @@ function ExploreIndexSearchInner({
                 className={`block px-4 py-2.5 text-sm transition-colors ${
                   index === activeIndex
                     ? "bg-accent-soft text-accent"
-                    : "text-fg hover:bg-accent-soft/60 hover:text-accent"
+                    : "bg-[var(--bg)] text-fg hover:bg-accent-soft hover:text-accent"
                 }`}
                 onMouseDown={(e) => e.preventDefault()}
                 onMouseEnter={() => setActiveIndex(index)}
@@ -182,7 +182,7 @@ function ExploreIndexSearchFallback({
   return (
     <div className="relative max-w-xl">
       <p className="text-[10px] uppercase tracking-[0.28em] text-muted">{label}</p>
-      <div className="mt-2 w-full rounded-sm border border-border/80 bg-bg-elevated/60 px-4 py-3 text-sm text-muted">
+      <div className="mt-2 w-full rounded-sm border border-border/80 bg-bg-elevated px-4 py-3 text-sm text-muted">
         {initialQuery || placeholder}
       </div>
     </div>
