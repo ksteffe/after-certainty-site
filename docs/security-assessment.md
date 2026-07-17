@@ -212,26 +212,26 @@ No request-time SSRF: fetch URLs are not taken from request query/body. Image re
 - Existing: `app/api/subscribe/route.test.ts`, `app/api/cache/revalidate/route.test.ts`
 - Local `next start` on `127.0.0.1:3000` with `BOOKS_MANIFEST_OFFLINE=1`, `SEMANTIC_MANIFEST_OFFLINE=1`, curl `--max-redirs 0`
 
-| Case                                                     | Result                                                                         | Notes                                                        |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Unsupported methods on subscribe/revalidate/json-ld/feed | **Pass** — 405 (OPTIONS on subscribe → 204)                                    | Next default method handling                                 |
-| Revalidate missing / wrong / Basic auth                  | **Pass** — 401                                                                 |                                                              |
-| Revalidate valid Bearer                                  | **Pass** — 200                                                                 | Vitest mocks refresh; live probe avoided for podcast network |
-| Revalidate secret unset                                  | **Pass** — 503                                                                 | Vitest                                                       |
-| Invalid JSON (subscribe/revalidate)                      | **Pass** — 400                                                                 |                                                              |
-| Empty / invalid email                                    | **Pass** — 400                                                                 |                                                              |
-| Oversized body with invalid email                        | **Pass** — 400                                                                 | No outbound                                                  |
-| Unknown / empty `targets`                                | **Pass** — 400                                                                 |                                                              |
-| Huge invalid `targets` array                             | **Pass** — 400                                                                 | Vitest                                                       |
-| Beehiiv network reject (mocked)                          | **Pass** — 500, no secret/stack leak                                           |                                                              |
-| Beehiiv 5xx (mocked)                                     | **Pass** — 502, sanitized message                                              |                                                              |
-| Oversized Beehiiv error message                          | **Pass** — replaced with generic                                               |                                                              |
-| Newsletter env missing                                   | **Pass** — 500 unavailable message                                             | Live + Vitest                                                |
-| Malformed manifests / RSS down                           | **Pass** (existing unit/integration)                                           | Offline fallbacks                                            |
-| JSON-LD known / unknown / long slug                      | **Pass** — 200 / 404 / 404                                                     | No crash on 2000-char slug                                   |
-| `/feed.xml`                                              | **Pass** — 307 to default Anchor URL                                           | Redirect target not user-controlled                          |
-| Security headers on `/`                                  | **Fail (confirms F4)** — CSP/XFO/nosniff/Referrer/Permissions/HSTS all missing |                                                              |
-| App-level rate limit after burst                         | **Pending / gap (F1)** — 25 mocked successes, no 429                           | Re-test after remediation                                    |
+| Case                                                     | Result                                                                  | Notes                                                        |
+| -------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Unsupported methods on subscribe/revalidate/json-ld/feed | **Pass** — 405 (OPTIONS on subscribe → 204)                             | Next default method handling                                 |
+| Revalidate missing / wrong / Basic auth                  | **Pass** — 401                                                          |                                                              |
+| Revalidate valid Bearer                                  | **Pass** — 200                                                          | Vitest mocks refresh; live probe avoided for podcast network |
+| Revalidate secret unset                                  | **Pass** — 503                                                          | Vitest                                                       |
+| Invalid JSON (subscribe/revalidate)                      | **Pass** — 400                                                          |                                                              |
+| Empty / invalid email                                    | **Pass** — 400                                                          |                                                              |
+| Oversized body with invalid email                        | **Pass** — 413 (after F6)                                               | No outbound                                                  |
+| Unknown / empty `targets`                                | **Pass** — 400                                                          |                                                              |
+| Huge invalid `targets` array                             | **Pass** — 400                                                          | Vitest                                                       |
+| Beehiiv network reject (mocked)                          | **Pass** — 502, no secret/stack leak                                    |                                                              |
+| Beehiiv 5xx (mocked)                                     | **Pass** — 502, sanitized message                                       |                                                              |
+| Oversized Beehiiv error message                          | **Pass** — replaced with generic                                        |                                                              |
+| Newsletter env missing                                   | **Pass** — 500 unavailable message                                      | Live + Vitest                                                |
+| Malformed manifests / RSS down                           | **Pass** (existing unit/integration)                                    | Offline fallbacks                                            |
+| JSON-LD known / unknown / long slug                      | **Pass** — 200 / 404 / 404                                              | No crash on 2000-char slug                                   |
+| `/feed.xml`                                              | **Pass** — 307 to default Anchor URL                                    | Redirect target not user-controlled                          |
+| Security headers on `/`                                  | **Pass (after F4)** — CSP/XFO/nosniff/Referrer/Permissions/HSTS present | Confirmed on local `next start`                              |
+| App-level rate limit after burst                         | **Pass (after F1)** — 6th same-email request → 429                      | Vitest mocked Beehiiv                                        |
 
 ---
 
