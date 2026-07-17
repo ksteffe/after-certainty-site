@@ -235,12 +235,17 @@ No request-time SSRF: fetch URLs are not taken from request query/body. Image re
 
 ---
 
-## Remediation priority (Phase 2)
+## Remediation status (Phase 2 — implemented)
 
-1. F2 timeouts + F3 http(s) URL allowlists + F6 body/email caps
-2. F1 subscribe rate limit
-3. F4 security headers
-4. F5 timing-safe compare
-5. F7 CI permissions + F8 Secure cookie
+| Finding            | Status    | Notes                                                   |
+| ------------------ | --------- | ------------------------------------------------------- |
+| F1 rate limit      | **Fixed** | In-memory IP + email limits on `/api/subscribe`         |
+| F2 timeouts        | **Fixed** | `AbortSignal.timeout(10s)` on Beehiiv, manifests, RSS   |
+| F3 http(s) URLs    | **Fixed** | Zod `httpUrlSchema` + RSS normalize + YouTube id checks |
+| F4 headers         | **Fixed** | `SECURITY_HEADERS` via `next.config.ts` `headers()`     |
+| F5 timing-safe     | **Fixed** | `timingSafeEqual` on revalidate bearer                  |
+| F6 body/email caps | **Fixed** | 4KB body / 254-char email                               |
+| F7 CI permissions  | **Fixed** | `permissions: contents: read`                           |
+| F8 Secure cookie   | **Fixed** | `Secure` when `location.protocol === 'https:'`          |
 
-Each remediation ships with the regression test listed above. Rate-limit dynamic case moves from Pending to Pass after F1.
+Rate-limit dynamic case: **Pass** after F1 (see `app/api/security-assessment.dynamic.test.ts`).

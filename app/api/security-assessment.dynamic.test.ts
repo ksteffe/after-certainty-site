@@ -1,10 +1,10 @@
 /**
- * Phase-1 defensive security dynamic tests.
+ * Phase-1/2 defensive security dynamic tests.
  * All outbound services (Beehiiv, GitHub, RSS) are mocked — no non-local hosts.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { POST as subscribePost } from "@/app/api/subscribe/route";
+import { POST as subscribePost, resetSubscribeRateLimitsForTests } from "@/app/api/subscribe/route";
 import { POST as revalidatePost } from "@/app/api/cache/revalidate/route";
 import { GET as feedGet } from "@/app/feed.xml/route";
 
@@ -53,6 +53,7 @@ describe("security assessment — POST /api/subscribe (mocked Beehiiv)", () => {
     prevPub = process.env.NEWSLETTER_PUBLICATION_ID;
     process.env.NEWSLETTER_API_KEY = "test-api-key";
     process.env.NEWSLETTER_PUBLICATION_ID = "pub_test_id";
+    resetSubscribeRateLimitsForTests();
     fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
   });
@@ -61,19 +62,13 @@ describe("security assessment — POST /api/subscribe (mocked Beehiiv)", () => {
     vi.unstubAllGlobals();
     process.env.NEWSLETTER_API_KEY = prevKey;
     process.env.NEWSLETTER_PUBLICATION_ID = prevPub;
+    resetSubscribeRateLimitsForTests();
   });
 
   it("rejects invalid JSON", async () => {
     const res = await subscribePost(subscribeRequest("not-json"));
     expect(res.status).toBe(400);
     expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it("accepts application/json with missing Content-Type still parsed by Request.json", async () => {
-    // Route uses request.json(); missing content-type is still attempted.
-    const res = await subscribePost(subscribeRequest({ email: "a@b.co" }, { contentType: null }));
-    // Without env issues this would call Beehiiv; ensure no crash
-    expect([200, 400, 500, 502]).toContain(res.status);
   });
 
   it("rejects empty and whitespace email", async () => {
@@ -90,36 +85,26 @@ describe("security assessment — POST /api/subscribe (mocked Beehiiv)", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("documents uncapped long email (F6 pre-remediation)", async () => {
-    const longLocal = "a".repeat(300);
-    const email = `${longLocal}@example.com`;
-    fetchMock.mockResolvedValueOnce(new Response("{}", { status: 200 }));
+  it("rejects long emails (F6)", async () => {
+    const email = `${"a".repeat(250)}@example.com`;
     const res = await subscribePost(subscribeRequest({ email }));
-    // Pre-remediation: may reach Beehiiv if regex passes; record behavior
-    if (EMAIL_LOOKS_VALID_TO_CURRENT_RE(email)) {
-      expect(fetchMock).toHaveBeenCalled();
-      expect(res.status).toBe(200);
-    } else {
-      expect(res.status).toBe(400);
-      expect(fetchMock).not.toHaveBeenCalled();
-    }
+    expect(res.status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("handles oversized JSON body without leaking secrets", async () => {
+  it("rejects oversized JSON body (F6)", async () => {
     const huge = { email: "ok@example.com", pad: "x".repeat(50_000) };
-    fetchMock.mockResolvedValueOnce(new Response("{}", { status: 200 }));
     const res = await subscribePost(subscribeRequest(huge));
-    const json = (await res.json()) as Record<string, unknown>;
-    expect(JSON.stringify(json)).not.toContain("test-api-key");
-    expect([200, 400, 413, 500]).toContain(res.status);
+    expect(res.status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("returns safe error when Beehiiv is unavailable (network reject)", async () => {
     fetchMock.mockRejectedValueOnce(new Error("ECONNREFUSED mock"));
     const res = await subscribePost(subscribeRequest({ email: "reader@example.com" }));
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(502);
     const json = (await res.json()) as { error: string };
-    expect(json.error).toBe("Internal server error");
+    expect(json.error).toBe("Could not complete signup. Please try again later.");
     expect(json.error).not.toMatch(/ECONNREFUSED|test-api-key|beehiiv/i);
   });
 
@@ -147,22 +132,25 @@ describe("security assessment — POST /api/subscribe (mocked Beehiiv)", () => {
     expect(json.error).not.toBe(longMsg);
   });
 
-  it("rate-limit behavior pending until F1 (documents gap)", async () => {
+  it("rate-limits repeated subscribe attempts (F1)", async () => {
     fetchMock.mockResolvedValue(new Response("{}", { status: 200 }));
     const statuses: number[] = [];
-    for (let i = 0; i < 25; i++) {
-      const res = await subscribePost(subscribeRequest({ email: `user${i}@example.com` }));
+    for (let i = 0; i < 8; i++) {
+      const res = await subscribePost(subscribeRequest({ email: `burst${i}@example.com` }));
       statuses.push(res.status);
     }
-    // Pre-remediation: all succeed at app layer (no local rate limit)
+    // Per-IP limit is 20; use same IP + same email to hit email limit of 5
+    resetSubscribeRateLimitsForTests();
+    const sameEmailStatuses: number[] = [];
+    for (let i = 0; i < 6; i++) {
+      const res = await subscribePost(subscribeRequest({ email: "repeat@example.com" }));
+      sameEmailStatuses.push(res.status);
+    }
+    expect(sameEmailStatuses.slice(0, 5).every((s) => s === 200)).toBe(true);
+    expect(sameEmailStatuses[5]).toBe(429);
     expect(statuses.every((s) => s === 200)).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(25);
   });
 });
-
-function EMAIL_LOOKS_VALID_TO_CURRENT_RE(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
 
 describe("security assessment — POST /api/cache/revalidate", () => {
   let prevSecret: string | undefined;
@@ -232,7 +220,7 @@ describe("security assessment — POST /api/cache/revalidate", () => {
     expect(empty.status).toBe(400);
   });
 
-  it("rejects oversized targets array with invalid entries", async () => {
+  it("rejects oversized targets array", async () => {
     const targets = Array.from({ length: 500 }, (_, i) => (i === 0 ? "podcast" : `t${i}`));
     const res = await revalidatePost(
       revalidateRequest({
@@ -260,12 +248,5 @@ describe("security assessment — GET /feed.xml", () => {
     const location = res.headers.get("location");
     expect(location).toBeTruthy();
     expect(location!.startsWith("http")).toBe(true);
-  });
-});
-
-describe("security assessment — rate limit pending marker", () => {
-  it("documents F1 rate-limit tests as pending until remediation", () => {
-    // Placeholder so the report matrix can cite this suite.
-    expect(true).toBe(true);
   });
 });
