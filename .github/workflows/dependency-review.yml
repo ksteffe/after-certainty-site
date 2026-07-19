@@ -1,0 +1,31 @@
+# Blocks PRs that introduce known-vulnerable dependencies.
+# Requires Dependency graph (and Dependency review for private repos).
+# https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review
+
+name: Dependency Review
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Dependency review
+        uses: actions/dependency-review-action@d02fa39f790d6e8a4ecafab5848251ff12c20df7 # v4.9.0
+        with:
+          # Align with CI npm audit --audit-level=high
+          fail-on-severity: high
+          show-patched-versions: true

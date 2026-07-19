@@ -45,6 +45,19 @@ Set **`NEXT_PUBLIC_SITE_URL`** to your canonical domain so metadata, Open Graph,
 
 Wire real manifests by swapping JSON under `data/` or pointing loaders in `lib/content-data.ts` at generated artifacts.
 
+## Dependency updates & security
+
+Keeping libraries and CI Actions current:
+
+| Mechanism | What it does |
+| --- | --- |
+| **Dependabot version updates** | Weekly PRs for npm and GitHub Actions (see `.github/dependabot.yml`). Minor/patch bumps are grouped; majors stay separate. |
+| **Dependabot alerts & security updates** | Enable under GitHub → **Settings → Code security** (Dependabot alerts + Dependabot security updates). Security PRs are not controlled by `dependabot.yml`. |
+| **CI `npm audit`** | Fails the build on high+ severity advisories (`.github/workflows/ci.yml`). |
+| **Dependency Review** | On pull requests, fails if the diff introduces high+ severity vulnerable packages (`.github/workflows/dependency-review.yml`). |
+
+After merging the Dependabot config, confirm those two Code security toggles are on so alerts and automatic security-fix PRs work.
+
 ## Deployment (Vercel)
 
 1. Connect the repository.
