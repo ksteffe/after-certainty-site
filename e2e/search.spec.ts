@@ -49,4 +49,17 @@ test.describe("global search", () => {
 
     await expect(page).toHaveURL(/\/explore\/concepts\/certainty/);
   });
+
+  test("mobile menu includes a Search entry that opens quick search", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+
+    await page.getByRole("button", { name: /Open menu/i }).click();
+    const searchItem = page.getByTestId("mobile-nav-search");
+    await expect(searchItem).toBeVisible();
+    await expect(searchItem).toHaveText(/Search/i);
+
+    await searchItem.click();
+    await expect(page.getByRole("dialog", { name: /Quick search/i })).toBeVisible();
+  });
 });

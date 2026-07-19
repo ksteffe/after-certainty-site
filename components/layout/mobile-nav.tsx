@@ -96,26 +96,15 @@ export function MobileNav({ items }: { items: readonly NavItem[] }) {
               >
                 <button
                   type="button"
-                  className="mb-2 flex min-h-11 w-full items-center gap-3 rounded-sm px-3 py-3 text-left text-sm uppercase tracking-[0.18em] text-fg transition-colors hover:bg-accent-soft/40 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  data-testid="mobile-nav-search"
+                  className="rounded-sm px-3 py-3 text-left text-sm uppercase tracking-[0.18em] text-fg transition-colors hover:bg-accent-soft/40 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   onClick={() => {
-                    close();
+                    // Open the palette first, then close the drawer on the next
+                    // frame so the menu unmount cannot race the search open.
                     openSearch("mobile");
+                    window.requestAnimationFrame(() => close());
                   }}
                 >
-                  <svg
-                    className="h-4 w-4 shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"
-                    />
-                  </svg>
                   Search
                 </button>
                 {items.map((item) => (

@@ -62,7 +62,7 @@ describe("SearchPaletteProvider", () => {
       </SearchPaletteProvider>,
     );
 
-    await user.click(screen.getByRole("button", { name: /Open search/i }));
+    await user.click(screen.getByRole("button", { name: /Search/i }));
     expect(trackSearchOpen).toHaveBeenCalledWith({ method: "header" });
     expect(screen.getByRole("dialog", { name: /Quick search/i })).toBeInTheDocument();
     await waitFor(() => {
