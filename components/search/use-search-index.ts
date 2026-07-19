@@ -6,6 +6,7 @@ import type { SearchIndexPayload } from "@/lib/search/indexPayload";
 import { createSearchEngine, type SearchEngine } from "@/lib/search/miniSearch";
 
 type SearchIndexState =
+  | { status: "idle" }
   | { status: "loading" }
   | { status: "ready"; engine: SearchEngine; payload: SearchIndexPayload }
   | { status: "error"; message: string };
@@ -14,7 +15,7 @@ let cachedPayload: SearchIndexPayload | null = null;
 let cachedEngine: SearchEngine | null = null;
 let inflight: Promise<SearchIndexPayload> | null = null;
 
-function readyState(): SearchIndexState | null {
+function readyState(): Extract<SearchIndexState, { status: "ready" }> | null {
   if (cachedEngine && cachedPayload) {
     return { status: "ready", engine: cachedEngine, payload: cachedPayload };
   }
@@ -42,11 +43,29 @@ async function fetchSearchIndexPayload(): Promise<SearchIndexPayload> {
   return inflight;
 }
 
+export type UseSearchIndexOptions = {
+  /** When false, skip fetching until enabled (used by quick search). Default true. */
+  enabled?: boolean;
+};
+
 /** Lazy-load and memoize the public search index for client MiniSearch. */
-export function useSearchIndex(): SearchIndexState {
-  const [state, setState] = useState<SearchIndexState>(() => readyState() ?? { status: "loading" });
+export function useSearchIndex(options: UseSearchIndexOptions = {}): SearchIndexState {
+  const enabled = options.enabled ?? true;
+  const [state, setState] = useState<SearchIndexState>(() => {
+    const ready = readyState();
+    if (ready) return ready;
+    return enabled ? { status: "loading" } : { status: "idle" };
+  });
+
+  const cached = readyState();
+  if (enabled && cached && state.status !== "ready") {
+    setState(cached);
+  } else if (enabled && !cached && state.status === "idle") {
+    setState({ status: "loading" });
+  }
 
   useEffect(() => {
+    if (!enabled) return;
     if (readyState()) return;
 
     let cancelled = false;
@@ -69,7 +88,7 @@ export function useSearchIndex(): SearchIndexState {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [enabled]);
 
   return state;
 }

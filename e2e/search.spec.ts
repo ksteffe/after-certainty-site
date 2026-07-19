@@ -31,4 +31,22 @@ test.describe("global search", () => {
     await bookFilter.click();
     await expect(page).toHaveURL(/type=book/);
   });
+
+  test("header quick search opens with Control+K and navigates to a result", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator(mainContent)).toBeVisible();
+
+    await page.keyboard.press("Control+KeyK");
+    const dialog = page.getByRole("dialog", { name: /Quick search/i });
+    await expect(dialog).toBeVisible();
+
+    const input = page.getByRole("searchbox", { name: /Quick search/i });
+    await input.fill("certainty");
+
+    const conceptOption = dialog.getByRole("option", { name: /Certainty/i }).first();
+    await expect(conceptOption).toBeVisible({ timeout: 15_000 });
+    await conceptOption.click();
+
+    await expect(page).toHaveURL(/\/explore\/concepts\/certainty/);
+  });
 });
