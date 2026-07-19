@@ -54,9 +54,10 @@ Keeping libraries and CI Actions current:
 | **Dependabot version updates** | Weekly PRs for npm and GitHub Actions (see `.github/dependabot.yml`). Minor/patch bumps are grouped; majors stay separate. |
 | **Dependabot alerts & security updates** | Enable under GitHub → **Settings → Code security** (Dependabot alerts + Dependabot security updates). Security PRs are not controlled by `dependabot.yml`. |
 | **CI `npm audit`** | Fails the build on high+ severity advisories (`.github/workflows/ci.yml`). |
-| **Dependency Review** | On pull requests, fails if the diff introduces high+ severity vulnerable packages (`.github/workflows/dependency-review.yml`). |
 
-After merging the Dependabot config, confirm those two Code security toggles are on so alerts and automatic security-fix PRs work.
+After merging the Dependabot config, confirm those Code security toggles are on so alerts and automatic security-fix PRs work.
+
+Optional: once **Dependency graph** is enabled in the same settings page, you can add GitHub’s [Dependency Review Action](https://github.com/actions/dependency-review-action) to fail PRs that introduce high+ severity vulnerable packages. It cannot run until that setting is on.
 
 ## Deployment (Vercel)
 
