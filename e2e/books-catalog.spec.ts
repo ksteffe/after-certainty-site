@@ -21,7 +21,10 @@ test.describe("Books catalog", () => {
     await page.goto("/explore/books?shelf=fiction");
     await expect(page).toHaveURL(/shelf=fiction/);
     await expect(page.getByRole("heading", { name: "Filtered catalog" })).toBeVisible();
-    await expect(page.getByText(/book/i)).toBeVisible();
+    await expect(page.locator("#main").getByText("4 books")).toBeVisible();
+    await expect(
+      page.locator("#main").getByRole("heading", { name: "The Relay", level: 3 }),
+    ).toBeVisible();
   });
 
   test("clearing filters returns bare books URL", async ({ page }) => {
@@ -33,6 +36,7 @@ test.describe("Books catalog", () => {
   test("navigates to book detail from catalog card", async ({ page }) => {
     await page.goto("/explore/books");
     await page
+      .locator("#main")
       .getByRole("link", { name: /After Certainty/i })
       .first()
       .click();

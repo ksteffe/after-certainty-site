@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { TrackedLink } from "@/components/analytics/tracked-link";
 import { CatalogBookCard } from "@/components/books/catalog-book-card";
 import { Section } from "@/components/ui/section";
