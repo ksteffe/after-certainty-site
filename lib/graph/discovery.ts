@@ -11,7 +11,6 @@ import type {
   PublicationRegistry,
 } from "@/lib/books/publication-registry-schema";
 import type { ContentType } from "@/lib/books/catalog-taxonomy";
-import type { SearchAliasConfig } from "@/lib/search/types";
 import type { WhatsNewEvent } from "@/lib/whats-new/schema";
 import type { PathStopInput } from "@/types/paths";
 import type { QuestionDefinition } from "@/types/questions";
@@ -161,18 +160,6 @@ export function bookOverviewsFromGraph(graph: SemanticGraph): BookOverview[] {
 
 export function bookOverviewPrioritySlugs(): string[] {
   return [...DEFAULT_BOOK_OVERVIEW_PRIORITY_SLUGS];
-}
-
-export function searchAliasConfigFromGraph(graph: SemanticGraph): SearchAliasConfig {
-  return {
-    version: 1,
-    entries: (graph.searchAliases ?? []).map((entry) => ({
-      terms: entry.terms,
-      kind: entry.kind,
-      targetIds: entry.targetIds,
-      note: entry.note,
-    })),
-  };
 }
 
 export function changeEventToWhatsNewEvent(event: ChangeEvent): WhatsNewEvent | null {

@@ -4,7 +4,7 @@ import {
   bookOverviewFromBook,
   bookOverviewPrioritySlugs,
 } from "@/lib/graph/discovery";
-import { validateSemanticGraph } from "@/lib/graph/manifest";
+import { validateSemanticGraph } from "@/lib/graph/validate";
 import type { BookOverview, BookOverviewsManifest } from "@/lib/books/book-overview-schema";
 import type { Book, SemanticGraph } from "@/types/semanticGraph";
 

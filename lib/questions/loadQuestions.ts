@@ -1,7 +1,7 @@
 import pathSearchBridgesJson from "@/data/path-search-bridges.json";
 import fallbackSemantic from "@/data/semantic-manifest.json";
 import { questionsFromGraph } from "@/lib/graph/discovery";
-import { validateSemanticGraph } from "@/lib/graph/manifest";
+import { validateSemanticGraph } from "@/lib/graph/validate";
 import type { ParsedQuestionsManifest } from "@/lib/questions/schema";
 import type { QuestionDefinition, QuestionSearchBridge } from "@/types/questions";
 import type { SemanticGraph } from "@/types/semanticGraph";

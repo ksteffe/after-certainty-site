@@ -1,11 +1,12 @@
 import { cache } from "react";
 import { revalidateTag } from "next/cache";
-import type { ZodError } from "zod";
 import fallbackSemantic from "@/data/semantic-manifest.json";
 import { outboundFetchSignal } from "@/lib/security/fetch";
 import { isSemanticManifestOffline, resolveSemanticManifestUrl } from "@/lib/site-config";
 import type { Book, SemanticGraph } from "@/types/semanticGraph";
-import { semanticGraphSchema, toSemanticGraph } from "@/lib/graph/schemas";
+import { validateSemanticGraph } from "@/lib/graph/validate";
+
+export { validateSemanticGraph, type ValidateSemanticGraphResult } from "@/lib/graph/validate";
 
 function semanticBookExportScore(book: Book): number {
   let score = 0;
@@ -169,22 +170,6 @@ function loadBundledFallbackGraph(): SemanticGraph {
     validated.error,
   );
   return EMPTY_GRAPH;
-}
-
-export type ValidateSemanticGraphResult =
-  | { success: true; data: SemanticGraph; error?: undefined }
-  | { success: false; data: undefined; error: ZodError | Error };
-
-/**
- * Runtime validation for arbitrary JSON (e.g. after fetch).
- * Malformed manifests never throw; callers inspect `success`.
- */
-export function validateSemanticGraph(raw: unknown): ValidateSemanticGraphResult {
-  const parsed = semanticGraphSchema.safeParse(raw);
-  if (!parsed.success) {
-    return { success: false, data: undefined, error: parsed.error };
-  }
-  return { success: true, data: toSemanticGraph(parsed.data) };
 }
 
 /**

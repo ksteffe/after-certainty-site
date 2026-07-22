@@ -1,6 +1,6 @@
 import fallbackSemantic from "@/data/semantic-manifest.json";
 import { publicationRegistryFromGraph } from "@/lib/graph/discovery";
-import { validateSemanticGraph } from "@/lib/graph/manifest";
+import { validateSemanticGraph } from "@/lib/graph/validate";
 import type {
   PublicationEdition,
   PublicationRegistry,

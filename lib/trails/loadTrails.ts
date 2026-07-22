@@ -1,7 +1,7 @@
 import pathSearchBridgesJson from "@/data/path-search-bridges.json";
 import fallbackSemantic from "@/data/semantic-manifest.json";
 import { trailsFromGraph } from "@/lib/graph/discovery";
-import { validateSemanticGraph } from "@/lib/graph/manifest";
+import { validateSemanticGraph } from "@/lib/graph/validate";
 import type { ParsedTrailsManifest } from "@/lib/trails/schema";
 import type { TrailDefinition, TrailSearchBridge } from "@/types/trails";
 import type { SemanticGraph } from "@/types/semanticGraph";

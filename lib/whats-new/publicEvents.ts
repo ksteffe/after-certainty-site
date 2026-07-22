@@ -1,6 +1,6 @@
 import fallbackSemantic from "@/data/semantic-manifest.json";
 import { changeEventsToWhatsNewEvents } from "@/lib/graph/discovery";
-import { validateSemanticGraph } from "@/lib/graph/manifest";
+import { validateSemanticGraph } from "@/lib/graph/validate";
 import { buildPodcastWhatsNewCandidates } from "@/lib/whats-new/candidates";
 import { getSiteWhatsNewManifest } from "@/lib/whats-new/loadWhatsNew";
 import type { WhatsNewEvent } from "@/lib/whats-new/schema";
