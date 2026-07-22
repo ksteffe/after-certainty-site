@@ -7,7 +7,6 @@ import { buildCatalogViewModel } from "@/lib/books/catalog-view-model";
 import { WOLTY_V1_SLUG } from "@/lib/books/book-slugs";
 import { assertCatalogHealthy } from "@/lib/books/validate-catalog";
 import { validateSemanticGraph } from "@/lib/graph/manifest";
-import type { SemanticGraph } from "@/types/semanticGraph";
 
 const validated = validateSemanticGraph(semanticManifest as unknown);
 if (!validated.success) {
