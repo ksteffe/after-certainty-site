@@ -173,6 +173,25 @@ export type EditionCompanionSelectParams = {
   notice: string;
 };
 
+export type WhatsNewViewParams = {
+  filter: string;
+  result_count: number;
+};
+
+export type WhatsNewSelectParams = {
+  event_id: string;
+  event_type: string;
+  location: string;
+};
+
+export type WhatsNewFilterParams = {
+  filter: string;
+};
+
+export type WhatsNewHomeSelectParams = {
+  location: string;
+};
+
 export const AnalyticsEvents = {
   selectContent: "select_content",
   fileDownload: "file_download",
@@ -212,6 +231,10 @@ export const AnalyticsEvents = {
   booksStartHereSelect: "books_start_here_select",
   editionCurrentSelect: "edition_current_select",
   editionCompanionSelect: "edition_companion_select",
+  whatsNewView: "whats_new_view",
+  whatsNewSelect: "whats_new_select",
+  whatsNewFilter: "whats_new_filter",
+  whatsNewHomeSelect: "whats_new_home_select",
 } as const;
 
 export type AnalyticsEventName = (typeof AnalyticsEvents)[keyof typeof AnalyticsEvents];

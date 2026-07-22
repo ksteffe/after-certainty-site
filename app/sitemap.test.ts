@@ -36,6 +36,7 @@ describe("sitemap", () => {
       "/explore/sources",
       "/search",
       "/podcast",
+      "/whats-new",
       "/collaborators",
       "/about",
     ] as const) {

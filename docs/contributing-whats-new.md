@@ -1,6 +1,17 @@
 # Contributing to What’s New
 
-What’s New is an authored chronological feed of **meaningful** public changes. Phase D lands the data model and seed; the `/whats-new` page is Phase E.
+What’s New is an authored chronological feed of **meaningful** public changes.
+
+## Public surface (Phase E)
+
+| Surface          | Path                                                                              |
+| ---------------- | --------------------------------------------------------------------------------- |
+| Index            | `/whats-new`                                                                      |
+| Filters          | `/whats-new?type=books\|revisions\|podcast\|site` (canonical always `/whats-new`) |
+| RSS              | `/whats-new/feed.xml`                                                             |
+| Homepage preview | “Latest from After Certainty” in the mission/recent section                       |
+| Start Here       | Link section                                                                      |
+| Footer           | What’s New                                                                        |
 
 ## Source of truth
 

@@ -23,6 +23,7 @@ const TOP_LEVEL_PATHS = [
   "/explore/sources",
   "/search",
   "/podcast",
+  "/whats-new",
   "/collaborators",
   "/about",
 ] as const;
