@@ -62,6 +62,10 @@ Default catalog hides non-canonical siblings. Append `?editions=all` to reveal t
 - Book detail pages use `EditionNotice` for companion, superseded, and upcoming callouts, with tracked links to the related volume.
 - Shared helpers live in `lib/books/public-status.ts`; UI in `components/books/status-label.tsx` and `edition-notice.tsx`.
 
+## Book overview overlays (Phase F)
+
+Authored orientation fields for redesigned book pages live in `data/book-overviews.json`. See [`docs/contributing-book-overviews.md`](contributing-book-overviews.md). Overlays do not change the public book page until Phase G.
+
 ## URL parameters
 
 | Param          | Purpose                                            |
