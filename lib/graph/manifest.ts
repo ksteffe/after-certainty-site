@@ -72,6 +72,24 @@ function parseGeneratedAt(graph: SemanticGraph): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function discoveryCollectionCount(graph: SemanticGraph): number {
+  return (
+    (graph.questions?.length ?? 0) +
+    (graph.trails?.length ?? 0) +
+    (graph.shelves?.length ?? 0) +
+    (graph.editions?.length ?? 0) +
+    (graph.changeEvents?.length ?? 0) +
+    (graph.searchAliases?.length ?? 0)
+  );
+}
+
+function schemaVersionScore(graph: SemanticGraph): number {
+  const raw = graph.schemaVersion?.trim();
+  if (!raw) return 0;
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 /** Prefer the graph with richer thinker/source metadata when ISR returns a stale release. */
 export function pickSemanticGraph(remote: SemanticGraph, bundled: SemanticGraph): SemanticGraph {
   const remoteEnriched = enrichedSourceCount(remote);
@@ -104,10 +122,33 @@ export function pickSemanticGraph(remote: SemanticGraph, bundled: SemanticGraph)
     return { ...bundled, books: dedupeSemanticGraphBooks(bundled.books) };
   }
 
+  const remoteDiscovery = discoveryCollectionCount(remote);
+  const bundledDiscovery = discoveryCollectionCount(bundled);
+  if (remoteDiscovery === 0 && bundledDiscovery > 0) {
+    logSemanticGraphError("Remote manifest lacks discovery collections; using bundled fallback.");
+    return { ...bundled, books: dedupeSemanticGraphBooks(bundled.books) };
+  }
+  if (bundledDiscovery > remoteDiscovery) {
+    logSemanticGraphError(
+      "Bundled manifest has richer discovery collections than remote; using bundled fallback.",
+    );
+    return { ...bundled, books: dedupeSemanticGraphBooks(bundled.books) };
+  }
+
+  const remoteSchema = schemaVersionScore(remote);
+  const bundledSchema = schemaVersionScore(bundled);
+  if (bundledSchema > remoteSchema) {
+    logSemanticGraphError(
+      "Bundled manifest has newer schemaVersion than remote; using bundled fallback.",
+    );
+    return { ...bundled, books: dedupeSemanticGraphBooks(bundled.books) };
+  }
+
   if (
     bundledEnriched > 0 &&
     bundledEnriched === remoteEnriched &&
     bundledThinkers === remoteThinkers &&
+    bundledDiscovery === remoteDiscovery &&
     parseGeneratedAt(bundled) > parseGeneratedAt(remote)
   ) {
     logSemanticGraphError("Bundled manifest is newer than remote; using bundled fallback.");

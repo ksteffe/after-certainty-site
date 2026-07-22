@@ -1,5 +1,8 @@
-import searchAliasesJson from "@/data/search-aliases.json";
+import fallbackSemantic from "@/data/semantic-manifest.json";
+import { searchAliasConfigFromGraph } from "@/lib/graph/discovery";
+import { validateSemanticGraph } from "@/lib/graph/manifest";
 import type { SearchAliasConfig, SearchAliasEntry, SearchAliasKind } from "@/lib/search/types";
+import type { SemanticGraph } from "@/types/semanticGraph";
 
 function isAliasKind(value: unknown): value is SearchAliasKind {
   return value === "alias" || value === "related";
@@ -43,9 +46,17 @@ export function parseSearchAliasConfig(data: unknown): SearchAliasConfig {
   return { version, entries };
 }
 
-/** Bundled authored vocabulary bridge (`data/search-aliases.json`). */
+export function getSearchAliasConfigFromGraph(graph: SemanticGraph): SearchAliasConfig {
+  return searchAliasConfigFromGraph(graph);
+}
+
+/** Sync accessor — uses bundled semantic-manifest searchAliases. */
 export function getSearchAliasConfig(): SearchAliasConfig {
-  return parseSearchAliasConfig(searchAliasesJson);
+  const result = validateSemanticGraph(fallbackSemantic as unknown);
+  if (!result.success) {
+    return { version: 1, entries: [] };
+  }
+  return searchAliasConfigFromGraph(result.data);
 }
 
 /**
