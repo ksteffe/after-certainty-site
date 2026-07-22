@@ -1,4 +1,5 @@
 import { TrackedLink } from "@/components/analytics/tracked-link";
+import { EditionNoticeViewBeacon } from "@/components/books/edition-notice-view-beacon";
 import { AnalyticsEvents } from "@/lib/analytics/events";
 import type { EditionRelationship } from "@/lib/books/publication-registry-schema";
 import { formatPublicationMonthYear, publicStatusLabel } from "@/lib/books/public-status";
@@ -53,8 +54,19 @@ export function EditionNotice({
     return null;
   }
 
+  const noticeKind = showSuperseded
+    ? "superseded"
+    : showCompanion
+      ? "companion"
+      : showPrimaryCompanion
+        ? "primary_companion"
+        : showUpcoming
+          ? "upcoming"
+          : "dates";
+
   return (
     <div className="mt-6 space-y-3">
+      <EditionNoticeViewBeacon bookId={bookId} notice={noticeKind} />
       {showSuperseded ? (
         <div
           role="status"

@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { BookWhatsNewLinks } from "@/components/books/book-whats-new-links";
 import { EditionNotice } from "@/components/books/edition-notice";
 import { StatusLabel } from "@/components/books/status-label";
 import { BreadcrumbTrail } from "@/components/explore/breadcrumb-trail";
@@ -18,6 +19,7 @@ import type { SemanticBookActionLinkItem } from "@/lib/books/semantic-book-actio
 import { explorePaths } from "@/lib/graph/explorePaths";
 import type { GraphIndex } from "@/lib/graph/graph";
 import { buildBookPageJsonLd } from "@/lib/seo/json-ld";
+import type { WhatsNewEvent } from "@/lib/whats-new/schema";
 import type { Book, GlossaryConcept, Pattern, Source, Thinker } from "@/types/semanticGraph";
 
 export type BookDetailLegacyLayoutProps = {
@@ -45,6 +47,7 @@ export type BookDetailLegacyLayoutProps = {
   hasRelationships: boolean;
   index: GraphIndex;
   breadcrumbs: { label: string; href?: string }[];
+  relatedWhatsNew?: WhatsNewEvent[];
 };
 
 /** Pre–Phase G book detail layout for books without an overview overlay. */
@@ -67,6 +70,7 @@ export function BookDetailLegacyLayout({
   hasRelationships,
   index,
   breadcrumbs,
+  relatedWhatsNew = [],
 }: BookDetailLegacyLayoutProps) {
   const hasRelated =
     inventory.concepts.length +
@@ -153,6 +157,19 @@ export function BookDetailLegacyLayout({
           prev={prevBook}
           next={nextBook}
         />
+      </Section>
+
+      <Section
+        atmosphere="none"
+        className="border-t border-border/25 !pt-8 md:!pt-10 !pb-8 md:!pb-10"
+        aria-label="What’s New"
+      >
+        <h2 className="font-display text-2xl font-medium tracking-tight text-fg md:text-3xl">
+          Updates for this book
+        </h2>
+        <div className="mt-6">
+          <BookWhatsNewLinks bookId={book.id} events={relatedWhatsNew} />
+        </div>
       </Section>
 
       <RelatedTrailsSection canonicalId={book.id} entityLabel="book" />

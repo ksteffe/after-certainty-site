@@ -27,6 +27,23 @@ describe("computeSearchBoostWeight", () => {
     expect(canonical).toBeGreaterThan(nonCanonical);
   });
 
+  it("demotes superseded editions further than ordinary non-canonical siblings", () => {
+    const companion = computeSearchBoostWeight({
+      entityType: "book",
+      status: "published",
+      hasEditionSiblings: true,
+      isCanonicalEdition: false,
+    });
+    const superseded = computeSearchBoostWeight({
+      entityType: "book",
+      status: "published",
+      hasEditionSiblings: true,
+      isCanonicalEdition: false,
+      isSuperseded: true,
+    });
+    expect(companion).toBeGreaterThan(superseded);
+  });
+
   it("applies type base weights", () => {
     expect(computeSearchBoostWeight({ entityType: "concept" })).toBeGreaterThan(
       computeSearchBoostWeight({ entityType: "source" }),

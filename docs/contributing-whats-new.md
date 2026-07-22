@@ -12,6 +12,7 @@ What’s New is an authored chronological feed of **meaningful** public changes.
 | Homepage preview | “Latest from After Certainty” in the mission/recent section                       |
 | Start Here       | Link section                                                                      |
 | Footer           | What’s New                                                                        |
+| Book pages       | Related events for that book (Phase H) via `findWhatsNewEventsForBook`            |
 
 ## Source of truth
 

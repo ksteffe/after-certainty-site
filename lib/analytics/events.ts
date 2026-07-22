@@ -192,6 +192,11 @@ export type WhatsNewHomeSelectParams = {
   location: string;
 };
 
+export type EditionNoticeViewParams = {
+  book_id: string;
+  notice: string;
+};
+
 export type BookOverviewPrimaryActionParams = {
   book_id: string;
   action_kind: string;
@@ -251,6 +256,7 @@ export const AnalyticsEvents = {
   booksStartHereSelect: "books_start_here_select",
   editionCurrentSelect: "edition_current_select",
   editionCompanionSelect: "edition_companion_select",
+  editionNoticeView: "edition_notice_view",
   whatsNewView: "whats_new_view",
   whatsNewSelect: "whats_new_select",
   whatsNewFilter: "whats_new_filter",

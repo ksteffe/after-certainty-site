@@ -79,6 +79,21 @@ describe("BookOverviewLayout", () => {
           secondary: [],
         }}
         relatedQuestions={[]}
+        relatedWhatsNew={[
+          {
+            id: "event-book-after-certainty-published",
+            type: "book_published",
+            title: "After Certainty is published",
+            summary: "Available to read.",
+            date: "2026-01-15",
+            entityType: "book",
+            entityId: book.id,
+            href: "/explore/books/after-certainty",
+            visibility: "public",
+            source: "authored",
+            published: true,
+          },
+        ]}
         inventory={{
           concepts: [],
           patterns: [],
@@ -114,6 +129,10 @@ describe("BookOverviewLayout", () => {
     expect(screen.getAllByRole("link", { name: "Coupling" })[0]).toHaveAttribute(
       "href",
       "/explore/books/coupling",
+    );
+    expect(screen.getByRole("link", { name: "After Certainty is published" })).toHaveAttribute(
+      "href",
+      "/explore/books/after-certainty",
     );
   });
 });

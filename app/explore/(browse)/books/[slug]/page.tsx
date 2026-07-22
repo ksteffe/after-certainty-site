@@ -15,6 +15,7 @@ import {
   getOrderedBookActions,
   getSemanticBookActionLinkItems,
 } from "@/lib/books/semantic-book-action-links";
+import { findWhatsNewEventsForBook } from "@/lib/whats-new/findEventsForBook";
 import {
   buildCoverImageBySlugLookup,
   resolveCoverForGraphBookSlug,
@@ -113,6 +114,7 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
   ];
 
   const overviewVm = buildBookOverviewViewModel(book, graph);
+  const relatedWhatsNew = findWhatsNewEventsForBook(book.id, { limit: 3 });
 
   if (overviewVm) {
     const actions = getOrderedBookActions({
@@ -134,6 +136,7 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
         companionEdition={companionEdition}
         actions={actions}
         relatedQuestions={findPublishedQuestionsForBook(book.id, 2)}
+        relatedWhatsNew={relatedWhatsNew}
         inventory={inventory}
         hasRelationships={hasRelationships}
         index={index}
@@ -169,6 +172,7 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
       hasRelationships={hasRelationships}
       index={index}
       breadcrumbs={bookBreadcrumbs}
+      relatedWhatsNew={relatedWhatsNew}
     />
   );
 }

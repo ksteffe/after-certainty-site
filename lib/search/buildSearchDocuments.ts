@@ -1,7 +1,11 @@
 import { WOLTY_PUBLIC_ALIAS, WOLTY_V1_SLUG } from "@/lib/books/book-slugs";
 import { parseBookEdition } from "@/lib/books/canonical-editions";
 import { bookDescription, bookPublicationStatus, findBookBySlug } from "@/lib/books/book-metadata";
-import { buildEditionGroups, type EditionGroupMeta } from "@/lib/books/resolve-work-edition";
+import {
+  buildEditionGroups,
+  resolveWorkEdition,
+  type EditionGroupMeta,
+} from "@/lib/books/resolve-work-edition";
 import { getConceptDisplayDefinition } from "@/lib/graph/conceptFormatting";
 import { explorePaths } from "@/lib/graph/explorePaths";
 import { buildGraphIndex, graphNodeTitle, type GraphIndex } from "@/lib/graph/graph";
@@ -81,6 +85,8 @@ function buildBookDocument(
   const status = bookPublicationStatus(book);
   const isCanonicalEdition = editionMeta.canonicalSlug === book.slug;
   const hasEditionSiblings = editionMeta.siblingCount > 1;
+  const workEdition = resolveWorkEdition(book, graph.books);
+  const isSuperseded = workEdition.relationship === "superseded";
 
   const conceptIds = book.concepts?.length ? [...book.concepts] : undefined;
   const patternIds = book.patterns?.length ? [...book.patterns] : undefined;
@@ -137,6 +143,7 @@ function buildBookDocument(
       status,
       isCanonicalEdition: hasEditionSiblings ? isCanonicalEdition : true,
       hasEditionSiblings,
+      isSuperseded,
     }),
     relationshipDensity: relationshipDensityForId(
       graph,

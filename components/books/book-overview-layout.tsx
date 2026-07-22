@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { TrackedLink } from "@/components/analytics/tracked-link";
 import { BookOverviewActions } from "@/components/books/book-overview-actions";
 import { BookOverviewEditionHistory } from "@/components/books/book-overview-edition-history";
+import { BookWhatsNewLinks } from "@/components/books/book-whats-new-links";
 import { EditionNotice } from "@/components/books/edition-notice";
 import { StatusLabel } from "@/components/books/status-label";
 import { BreadcrumbTrail } from "@/components/explore/breadcrumb-trail";
@@ -25,6 +26,7 @@ import { explorePaths } from "@/lib/graph/explorePaths";
 import type { GraphIndex } from "@/lib/graph/graph";
 import { buildBookPageJsonLd } from "@/lib/seo/json-ld";
 import type { QuestionDefinition } from "@/types/questions";
+import type { WhatsNewEvent } from "@/lib/whats-new/schema";
 import type { Book, GlossaryConcept, Pattern, Source, Thinker } from "@/types/semanticGraph";
 
 export type BookOverviewRelatedInventory = {
@@ -43,6 +45,7 @@ export type BookOverviewLayoutProps = {
   companionEdition?: Book;
   actions: OrderedBookActions;
   relatedQuestions: QuestionDefinition[];
+  relatedWhatsNew: WhatsNewEvent[];
   inventory: BookOverviewRelatedInventory;
   hasRelationships: boolean;
   index: GraphIndex;
@@ -81,6 +84,7 @@ export function BookOverviewLayout({
   companionEdition,
   actions,
   relatedQuestions,
+  relatedWhatsNew,
   inventory,
   hasRelationships,
   index,
@@ -448,19 +452,13 @@ export function BookOverviewLayout({
               </TrackedLink>
             </li>
           ) : null}
-          <li>
-            <TrackedLink
-              href="/whats-new"
-              className="text-accent underline-offset-4 hover:underline"
-              analytics={{
-                event: AnalyticsEvents.whatsNewHomeSelect,
-                params: { location: "book_overview" },
-              }}
-            >
-              See what’s new across the project
-            </TrackedLink>
-          </li>
         </ul>
+        <div className="mt-8 border-t border-border/25 pt-6">
+          <h3 className="text-[11px] uppercase tracking-[0.24em] text-muted">Updates</h3>
+          <div className="mt-3">
+            <BookWhatsNewLinks bookId={book.id} events={relatedWhatsNew} />
+          </div>
+        </div>
       </OverviewSection>
 
       {relatedTrails}
