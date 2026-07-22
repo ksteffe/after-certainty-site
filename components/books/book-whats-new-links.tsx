@@ -68,7 +68,7 @@ export function BookWhatsNewLinks({ bookId, events, variant = "section" }: BookW
           className="text-accent underline-offset-4 hover:underline"
           analytics={{
             event: AnalyticsEvents.whatsNewHomeSelect,
-            params: { location: `book_${bookId}` },
+            params: { location: "book_page" },
           }}
         >
           Browse all updates
