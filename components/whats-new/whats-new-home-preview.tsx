@@ -1,7 +1,6 @@
 import { TrackedLink } from "@/components/analytics/tracked-link";
 import { WhatsNewEventCard } from "@/components/whats-new/whats-new-event-card";
 import { AnalyticsEvents } from "@/lib/analytics/events";
-import { Container } from "@/components/ui/container";
 import { getPodcastEpisodes } from "@/lib/content-data";
 import { buildPublicWhatsNewEvents } from "@/lib/whats-new/publicEvents";
 
