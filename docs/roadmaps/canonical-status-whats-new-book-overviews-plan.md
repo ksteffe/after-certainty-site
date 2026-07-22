@@ -3,7 +3,7 @@
 **Deliverable path:** [`docs/roadmaps/canonical-status-whats-new-book-overviews-plan.md`](canonical-status-whats-new-book-overviews-plan.md)  
 **Location rationale:** The repo stores product and architecture plans under [`docs/roadmaps/`](./) (e.g. [`start-with-a-question-plan.md`](start-with-a-question-plan.md), [`global-search-plan.md`](global-search-plan.md)). Contributing guides live at [`docs/`](../). This document follows that convention.
 
-**Status:** Planning complete. **Phases A–C landed** — publication registry, registry-first resolution, and shared status/edition labels/notices on catalog cards and book detail pages.
+**Status:** Planning complete. **Phases A–D landed** — publication registry, resolution, status/edition labels, and What’s New change-event model with curated seed (`data/whats-new.json`). Public `/whats-new` page is Phase E.
 
 **Scope of this document:** Product and technical plan. Implementation proceeds in phases A–H.
 
