@@ -56,6 +56,12 @@ Fiction and handbook labels are editorial until upstream adds `contentType`. Upd
 
 Default catalog hides non-canonical siblings. Append `?editions=all` to reveal them. Companions remain in the sitemap and on detail URLs.
 
+## Status and edition labels (Phase C)
+
+- Catalog cards show at most **one** exceptional chip (Upcoming, Companion edition, or Earlier edition) beside the content type. Primary/sole labels are omitted on cards.
+- Book detail pages use `EditionNotice` for companion, superseded, and upcoming callouts, with tracked links to the related volume.
+- Shared helpers live in `lib/books/public-status.ts`; UI in `components/books/status-label.tsx` and `edition-notice.tsx`.
+
 ## URL parameters
 
 | Param          | Purpose                                            |

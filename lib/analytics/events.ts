@@ -161,6 +161,18 @@ export type BooksStartHereSelectParams = {
   book_id: string;
 };
 
+export type EditionCurrentSelectParams = {
+  book_id: string;
+  destination: string;
+  notice: string;
+};
+
+export type EditionCompanionSelectParams = {
+  book_id: string;
+  destination: string;
+  notice: string;
+};
+
 export const AnalyticsEvents = {
   selectContent: "select_content",
   fileDownload: "file_download",
@@ -198,6 +210,8 @@ export const AnalyticsEvents = {
   booksCardSelect: "books_card_select",
   booksNoMatch: "books_no_match",
   booksStartHereSelect: "books_start_here_select",
+  editionCurrentSelect: "edition_current_select",
+  editionCompanionSelect: "edition_companion_select",
 } as const;
 
 export type AnalyticsEventName = (typeof AnalyticsEvents)[keyof typeof AnalyticsEvents];

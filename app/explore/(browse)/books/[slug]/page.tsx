@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { resolveBookCanonicalSlug } from "@/lib/books/book-slugs";
+import { bookPublicationStatus } from "@/lib/books/book-metadata";
+import { getPublicationEditionByBookId } from "@/lib/books/load-publication-registry";
+import { resolveWorkEdition } from "@/lib/books/resolve-work-edition";
+import { publicStatusLabel } from "@/lib/books/public-status";
+import { getSemanticBookActionLinkItems } from "@/lib/books/semantic-book-action-links";
+import { EditionNotice } from "@/components/books/edition-notice";
+import { StatusLabel } from "@/components/books/status-label";
 import { BreadcrumbTrail } from "@/components/explore/breadcrumb-trail";
 import { JsonLd } from "@/components/seo/json-ld";
 import { ExploreBookMedia } from "@/components/explore/explore-book-media";
@@ -27,7 +34,6 @@ import { buildGraphIndex } from "@/lib/graph/graph";
 import { getBookBySlug as getGraphBookBySlug } from "@/lib/graph/graphQueries";
 import { relatedContentForBook } from "@/lib/graph/relatedContent";
 import { resolveThinkersForBook } from "@/lib/graph/bookThinkers";
-import { getSemanticBookActionLinkItems } from "@/lib/books/semantic-book-action-links";
 import { createPageMetadata } from "@/lib/metadata";
 import { buildBookPageJsonLd } from "@/lib/seo/json-ld";
 
@@ -79,6 +85,27 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
   );
 
   const publicationLinks = getSemanticBookActionLinkItems(book);
+  const resolved = resolveWorkEdition(book, graph.books);
+  const registryEdition = getPublicationEditionByBookId(book.id);
+  const status = bookPublicationStatus(book);
+  const upcomingLabel = publicStatusLabel(status);
+
+  const relatedSlug =
+    resolved.relationship === "superseded"
+      ? resolved.supersededBySlug
+      : resolved.relationship === "companion"
+        ? resolved.companionOfSlug
+        : undefined;
+  const relatedEdition = relatedSlug ? graph.books.find((b) => b.slug === relatedSlug) : undefined;
+
+  const companionEdition =
+    resolved.relationship === "primary"
+      ? graph.books.find(
+          (b) =>
+            (book.companionBooks?.includes(b.slug) ?? false) ||
+            resolveWorkEdition(b, graph.books).companionOfSlug === book.slug,
+        )
+      : undefined;
 
   const hasRelated =
     related.concepts.length +
@@ -105,7 +132,16 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
       />
       <Section atmosphere="none" className="pt-10 md:pt-14 !pb-10 md:!pb-12">
         <BreadcrumbTrail items={bookBreadcrumbs} />
-        <p className="text-[11px] uppercase tracking-[0.28em] text-accent">Book</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-accent">Book</p>
+          {upcomingLabel ? <StatusLabel label={upcomingLabel} kind="upcoming" /> : null}
+          {resolved.relationship === "companion" ? (
+            <StatusLabel label={resolved.editionLabel ?? "Companion edition"} kind="companion" />
+          ) : null}
+          {resolved.relationship === "superseded" ? (
+            <StatusLabel label={resolved.editionLabel ?? "Earlier edition"} kind="superseded" />
+          ) : null}
+        </div>
         <div
           className={
             coverSrc
@@ -139,6 +175,23 @@ export default async function ExploreBookDetailPage({ params }: PageProps) {
                 <LinkifiedText text={book.summary} />
               </p>
             ) : null}
+            <EditionNotice
+              bookId={book.id}
+              status={status}
+              relationship={resolved.relationship}
+              editionLabel={resolved.editionLabel}
+              relatedHref={
+                relatedEdition ? `${explorePaths.books}/${relatedEdition.slug}` : undefined
+              }
+              relatedTitle={relatedEdition?.title}
+              companionHref={
+                companionEdition ? `${explorePaths.books}/${companionEdition.slug}` : undefined
+              }
+              companionTitle={companionEdition?.title}
+              firstPublishedAt={registryEdition?.firstPublishedAt}
+              revisedAt={registryEdition?.revisedAt}
+              changeSummary={registryEdition?.changeSummary}
+            />
           </div>
         </div>
         <ExploreEntityDetailActions
