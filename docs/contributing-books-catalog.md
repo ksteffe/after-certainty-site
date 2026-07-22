@@ -64,7 +64,7 @@ Default catalog hides non-canonical siblings. Append `?editions=all` to reveal t
 
 ## Book overview overlays (Phase F)
 
-Authored orientation fields for redesigned book pages live in `data/book-overviews.json`. See [`docs/contributing-book-overviews.md`](contributing-book-overviews.md). Overlays do not change the public book page until Phase G.
+Authored orientation fields for redesigned book pages live in `data/book-overviews.json`. Books with an overlay use the Phase G overview IA; others keep the legacy layout plus shared status/edition notices. See [`docs/contributing-book-overviews.md`](contributing-book-overviews.md).
 
 ## URL parameters
 

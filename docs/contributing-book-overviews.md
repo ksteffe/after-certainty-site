@@ -1,6 +1,6 @@
 # Contributing book overview overlays
 
-Authored orientation fields for redesigned book pages live in `data/book-overviews.json`. Phase G renders a new overview IA only when an overlay exists; other books keep the current layout.
+Authored orientation fields for redesigned book pages live in `data/book-overviews.json`. Phase G renders the orientation-first overview IA when an overlay exists; other books keep the current layout.
 
 ## What belongs here
 

@@ -192,6 +192,26 @@ export type WhatsNewHomeSelectParams = {
   location: string;
 };
 
+export type BookOverviewPrimaryActionParams = {
+  book_id: string;
+  action_kind: string;
+};
+
+export type BookOverviewConceptSelectParams = {
+  book_id: string;
+  concept_id: string;
+};
+
+export type BookOverviewRelatedSelectParams = {
+  book_id: string;
+  destination_id: string;
+  destination_kind: "book" | "trail" | "question" | "pattern" | "concept";
+};
+
+export type BookOverviewEditionHistoryOpenParams = {
+  book_id: string;
+};
+
 export const AnalyticsEvents = {
   selectContent: "select_content",
   fileDownload: "file_download",
@@ -235,6 +255,10 @@ export const AnalyticsEvents = {
   whatsNewSelect: "whats_new_select",
   whatsNewFilter: "whats_new_filter",
   whatsNewHomeSelect: "whats_new_home_select",
+  bookOverviewPrimaryAction: "book_overview_primary_action",
+  bookOverviewConceptSelect: "book_overview_concept_select",
+  bookOverviewRelatedSelect: "book_overview_related_select",
+  bookOverviewEditionHistoryOpen: "book_overview_edition_history_open",
 } as const;
 
 export type AnalyticsEventName = (typeof AnalyticsEvents)[keyof typeof AnalyticsEvents];
