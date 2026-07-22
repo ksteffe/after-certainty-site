@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { bookIsPublic } from "@/lib/books/book-metadata";
 import { getBooks } from "@/lib/content-data";
 import { getQuestionSitemapSlugs } from "@/lib/questions/loadQuestions";
 import { getTrailSitemapSlugs } from "@/lib/trails/loadTrails";
@@ -37,6 +38,7 @@ export async function getSitemapPaths(): Promise<string[]> {
 
   const books = await getBooks();
   for (const book of books) {
+    if (!bookIsPublic(book)) continue;
     paths.push(`${explorePaths.books}/${book.slug}`);
   }
 

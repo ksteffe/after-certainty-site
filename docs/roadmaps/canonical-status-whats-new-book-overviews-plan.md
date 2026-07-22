@@ -3,7 +3,7 @@
 **Deliverable path:** [`docs/roadmaps/canonical-status-whats-new-book-overviews-plan.md`](canonical-status-whats-new-book-overviews-plan.md)  
 **Location rationale:** The repo stores product and architecture plans under [`docs/roadmaps/`](./) (e.g. [`start-with-a-question-plan.md`](start-with-a-question-plan.md), [`global-search-plan.md`](global-search-plan.md)). Contributing guides live at [`docs/`](../). This document follows that convention.
 
-**Status:** Planning complete. **Phase A in progress / landed on this branch** — publication registry schema + audited mapping for all graph books (not yet wired into catalog resolution; that is Phase B).
+**Status:** Planning complete. **Phase A landed. Phase B landed** — publication registry wired into work/edition resolution, catalog view-model, catalog health, search edition groups, and sitemap draft filtering.
 
 **Scope of this document:** Product and technical plan. Implementation proceeds in phases A–H.
 

@@ -13,6 +13,7 @@ const sampleBook: CatalogBookView = {
   status: "published",
   isPublic: true,
   isCanonicalEdition: true,
+  editionRelationship: "sole",
   contentType: "nonfiction",
   themes: [],
   shelfIds: ["core-after-certainty"],

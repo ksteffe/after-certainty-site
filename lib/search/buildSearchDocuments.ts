@@ -1,10 +1,7 @@
 import { WOLTY_PUBLIC_ALIAS, WOLTY_V1_SLUG } from "@/lib/books/book-slugs";
-import {
-  buildEditionGroups,
-  parseBookEdition,
-  type EditionGroupMeta,
-} from "@/lib/books/canonical-editions";
+import { parseBookEdition } from "@/lib/books/canonical-editions";
 import { bookDescription, bookPublicationStatus, findBookBySlug } from "@/lib/books/book-metadata";
+import { buildEditionGroups, type EditionGroupMeta } from "@/lib/books/resolve-work-edition";
 import { getConceptDisplayDefinition } from "@/lib/graph/conceptFormatting";
 import { explorePaths } from "@/lib/graph/explorePaths";
 import { buildGraphIndex, graphNodeTitle, type GraphIndex } from "@/lib/graph/graph";
@@ -51,8 +48,8 @@ export function findCatalogBookForSlug(
   return findBookBySlug(slug, books);
 }
 
-export { parseBookEdition } from "@/lib/books/canonical-editions";
-export { pickCanonicalEditionSlug } from "@/lib/books/canonical-editions";
+export { parseBookEdition, pickCanonicalEditionSlug } from "@/lib/books/canonical-editions";
+export { buildEditionGroups, isCanonicalEdition } from "@/lib/books/resolve-work-edition";
 
 function resolveRelatedTitles(index: GraphIndex, refs: readonly string[] | undefined): string[] {
   if (!refs?.length) return [];

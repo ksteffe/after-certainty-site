@@ -14,7 +14,8 @@ flowchart LR
 ```
 
 - **Source of truth for book content:** `data/semantic-manifest.json` (ISR from `ksteffe/after-certainty` releases).
-- **Publication registry (Phase A):** `data/publication-registry.json` — work/edition resolution overlays (IDs, canonical flags, companion/supersession links, optional dates). Does **not** duplicate titles, covers, or download URLs. Not yet wired into the catalog view-model (Phase B).
+- **Publication registry:** `data/publication-registry.json` — work/edition resolution overlays (IDs, canonical flags, companion/supersession links, optional dates). Does **not** duplicate titles, covers, or download URLs.
+- **Resolution layer (Phase B):** `lib/books/resolve-work-edition.ts` prefers the registry and falls back to `-vN` heuristics for unregistered books. Catalog, search, and validation consume this resolver.
 - **Join layer:** `lib/books/catalog-view-model.ts` normalizes graph books into `CatalogBookView`.
 - **Editorial shelves:** `lib/books/shelves.ts` — curated slug lists and small rule-based shelves.
 - **Taxonomy:** `lib/books/catalog-taxonomy.ts` — content-type slug map and recommended sort order.
@@ -44,16 +45,16 @@ Fiction and handbook labels are editorial until upstream adds `contentType`. Upd
 
 ## Canonical editions and companions
 
-**Current catalog behavior** still uses slug `-vN` heuristics in `lib/books/canonical-editions.ts` (Phase B will prefer the registry).
+**Resolution** uses `lib/books/resolve-work-edition.ts` + `data/publication-registry.json` (heuristics in `canonical-editions.ts` only for unregistered books).
 
-**Registry policy (Phase A):**
+**Registry policy:**
 
 - Each intellectual **work** has exactly one canonical public **edition**.
 - **Companion** volumes (e.g. When Others Look to You v2) share a `workId`, are **not** canonical for the default catalog, and must **not** be labeled superseded.
 - **Superseded** requires an explicit `supersededByEditionId` — never infer supersession from `-vN` alone.
 - WoLTY: `work-when-others-look-to-you`; v1 = primary/canonical; v2 = companion.
 
-Default catalog hides non-canonical siblings. Append `?editions=all` to reveal them.
+Default catalog hides non-canonical siblings. Append `?editions=all` to reveal them. Companions remain in the sitemap and on detail URLs.
 
 ## URL parameters
 
@@ -74,12 +75,9 @@ Filtered views set `alternates.canonical` to `/explore/books`.
 `lib/books/validate-catalog.ts` fails the build on:
 
 - Unknown shelf slugs, duplicate IDs, non-canonical editions on curated shelves, draft books on public shelves
+- Publication-registry health errors (coverage, multiple canonicals, WoLTY companion policy)
 
-`lib/books/validate-publication-registry.ts` fails on:
-
-- Duplicate book ids/slugs, multiple canonicals per work, missing registry coverage vs the graph, broken companion/supersession refs, WoLTY companion policy violations
-
-Warnings (non-blocking): empty shelves, missing covers/descriptions, books on no shelf, missing `firstPublishedAt` until editorial backfill.
+Sitemap book URLs exclude drafts (`bookIsPublic`).
 
 ## Local preview
 
