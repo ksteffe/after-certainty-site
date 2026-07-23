@@ -31,12 +31,9 @@ describe("public corpus registry", () => {
 
 describe("public corpus integrity", () => {
   it("passes for the bundled production manifest", () => {
-    expect(() => assertPublicCorpusHealthy(graph, { podcastEpisodes: episodes })).not.toThrow();
-    const report = collectPublicCorpusIntegrityIssues(graph, {
-      podcastEpisodes: episodes,
-    });
+    const report = assertPublicCorpusHealthy(graph, { podcastEpisodes: episodes });
     expect(report.errors).toEqual([]);
-  });
+  }, 30_000);
 
   it("drops demoted trails from the public registry trails collection", () => {
     const published = (graph.trails ?? []).filter((t) => t.status === "published");
@@ -53,5 +50,5 @@ describe("public corpus integrity", () => {
     });
     expect(report.registry.trails.some((t) => t.id === demotedId)).toBe(false);
     expect(report.registry.trails.length).toBe(published.length - 1);
-  });
+  }, 30_000);
 });

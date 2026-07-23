@@ -1,5 +1,9 @@
 import { bookIsPublic } from "@/lib/books/book-metadata";
-import { buildCatalogViewModel, defaultCatalogBooks } from "@/lib/books/catalog-view-model";
+import {
+  buildCatalogViewModel,
+  defaultCatalogBooks,
+  type CatalogBookView,
+} from "@/lib/books/catalog-view-model";
 import { getActiveShelves, resolveShelfBooks } from "@/lib/books/shelves";
 import { explorePaths } from "@/lib/graph/explorePaths";
 import { contentTypeInfoFromBook } from "@/lib/graph/content-type";
@@ -8,6 +12,7 @@ import { getPublishedQuestions } from "@/lib/questions/loadQuestions";
 import { getPublishedTrails } from "@/lib/trails/loadTrails";
 import { buildSearchDocuments } from "@/lib/search/buildSearchDocuments";
 import type { ContentType } from "@/lib/books/catalog-taxonomy";
+import type { SearchDocument } from "@/lib/search/types";
 import type { SemanticGraph } from "@/types/semanticGraph";
 
 export type PublicEntityKind =
@@ -49,6 +54,12 @@ export type PublicCorpusRegistry = {
   situations: PublicEntityRecord[];
   thinkers: PublicEntityRecord[];
   sources: PublicEntityRecord[];
+  /** Catalog view-model used to build this registry (reuse in integrity checks). */
+  catalogViewModel: CatalogBookView[];
+  /** Search documents built once for this registry. */
+  searchDocuments: SearchDocument[];
+  /** Search document ids for eligibility checks. */
+  searchDocumentIds: Set<string>;
   /** Catalog view-model content types keyed by book id (canonical public only). */
   catalogContentTypeByBookId: Map<string, ContentType>;
   /** Search document content types keyed by book id. */
@@ -99,6 +110,7 @@ export function buildPublicCorpusRegistry(graph: SemanticGraph): PublicCorpusReg
   }
 
   const searchDocs = buildSearchDocuments({ graph });
+  const searchDocumentIds = new Set(searchDocs.map((d) => d.id));
   for (const doc of searchDocs) {
     if (doc.entityType === "book" && doc.contentType) {
       searchContentTypeByBookId.set(doc.id, doc.contentType);
@@ -266,6 +278,9 @@ export function buildPublicCorpusRegistry(graph: SemanticGraph): PublicCorpusReg
     situations,
     thinkers,
     sources,
+    catalogViewModel: catalogVm,
+    searchDocuments: searchDocs,
+    searchDocumentIds,
     catalogContentTypeByBookId,
     searchContentTypeByBookId,
     sitemapPaths,

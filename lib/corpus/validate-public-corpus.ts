@@ -1,14 +1,11 @@
-import { buildCatalogViewModel } from "@/lib/books/catalog-view-model";
+import { type CatalogBookView } from "@/lib/books/catalog-view-model";
 import { collectCatalogHealthIssues } from "@/lib/books/validate-catalog";
 import { buildPublicCorpusRegistry, type PublicCorpusRegistry } from "@/lib/corpus/public-registry";
 import { questionsFromGraph, trailsFromGraph } from "@/lib/graph/discovery";
-import { buildGraphIndex } from "@/lib/graph/graph";
 import { getFeaturedQuestions, getQuestionSearchBridges } from "@/lib/questions/loadQuestions";
 import { collectQuestionHealthIssues } from "@/lib/questions/validate";
 import { FRONT_SHELF_ENTRIES } from "@/lib/start/front-shelf";
-import { buildSearchDocuments } from "@/lib/search/buildSearchDocuments";
-import { findPublishedTrailsForEntity } from "@/lib/trails/relatedTrails";
-import { getPublishedTrails, getTrailSearchBridges } from "@/lib/trails/loadTrails";
+import { getTrailSearchBridges } from "@/lib/trails/loadTrails";
 import { collectTrailHealthIssues } from "@/lib/trails/validate";
 import type { PodcastEpisode } from "@/types/content";
 import type { SemanticGraph } from "@/types/semanticGraph";
@@ -50,7 +47,7 @@ export function collectPublicCorpusIntegrityIssues(
 ): CorpusIntegrityReport {
   const issues: CorpusIntegrityIssue[] = [];
   const registry = buildPublicCorpusRegistry(graph);
-  const viewModel = buildCatalogViewModel(graph);
+  const viewModel: readonly CatalogBookView[] = registry.catalogViewModel;
   const podcastEpisodes = options?.podcastEpisodes ?? [];
 
   for (const issue of collectCatalogHealthIssues({ viewModel, graph })) {
@@ -122,9 +119,8 @@ export function collectPublicCorpusIntegrityIssues(
     }
   }
 
-  const searchDocs = buildSearchDocuments({ graph });
-  const searchIds = new Set(searchDocs.map((d) => d.id));
-  for (const doc of searchDocs) {
+  const searchIds = registry.searchDocumentIds;
+  for (const doc of registry.searchDocuments) {
     if (!doc.canonicalUrl?.trim()) {
       issues.push({
         severity: "error",
@@ -172,6 +168,41 @@ export function collectPublicCorpusIntegrityIssues(
         sourceFeature: "trails",
         targetFeature: "sitemap",
         detail: `Published trail "${t.slug}" missing from sitemap path set.`,
+      });
+    }
+  }
+
+  // Trails linked from listed books must appear in the public trails collection + sitemap.
+  // Walk trail stops once (O(trails × stops)) instead of per-book related-trail scans.
+  const listedBookIds = new Set(
+    registry.books.filter((b) => b.visibility === "listed").map((b) => b.id),
+  );
+  const trailIdsBySlug = new Map(registry.trails.map((t) => [t.slug, t.id]));
+  for (const trail of trailsFromGraph(graph)) {
+    if (trail.status !== "published") continue;
+    const referencesListedBook = trail.pathStops.some(
+      (stop) => stop.entityType === "book" && stop.entityId && listedBookIds.has(stop.entityId),
+    );
+    if (!referencesListedBook) continue;
+
+    if (!trailIdsBySlug.has(trail.slug)) {
+      issues.push({
+        severity: "error",
+        code: "TRAIL_INDEX_MISSING",
+        entityId: trail.id,
+        sourceFeature: "book",
+        targetFeature: "trails",
+        detail: `Trail "${trail.slug}" references a public book but is absent from the public trails index.`,
+      });
+    }
+    if (!sitemapSet.has(`/trails/${trail.slug}`)) {
+      issues.push({
+        severity: "error",
+        code: "TRAIL_SITEMAP_MISSING",
+        entityId: trail.id,
+        sourceFeature: "book",
+        targetFeature: "sitemap",
+        detail: `Trail "${trail.slug}" linked from a public book is missing from sitemap paths.`,
       });
     }
   }
@@ -228,41 +259,6 @@ export function collectPublicCorpusIntegrityIssues(
           sourceFeature: "shelves",
           targetFeature: "catalog",
           detail: `Shelf "${shelfId}" references non-public or missing book "${bookId}".`,
-        });
-      }
-    }
-  }
-
-  const index = buildGraphIndex(graph);
-  const publishedTrails = getPublishedTrails(graph);
-  const publishedTrailIds = new Set(publishedTrails.map((t) => t.id));
-  for (const book of registry.books.filter((b) => b.visibility === "listed")) {
-    const related = findPublishedTrailsForEntity({
-      canonicalId: book.id,
-      index,
-      books: graph.books,
-      trails: publishedTrails,
-      limit: 20,
-    });
-    for (const trail of related) {
-      if (!publishedTrailIds.has(trail.id)) {
-        issues.push({
-          severity: "error",
-          code: "TRAIL_INDEX_MISSING",
-          entityId: trail.id,
-          sourceFeature: "book",
-          targetFeature: "trails",
-          detail: `Trail "${trail.slug}" is referenced by book "${book.slug}" but is absent from the public trails index.`,
-        });
-      }
-      if (!sitemapSet.has(`/trails/${trail.slug}`)) {
-        issues.push({
-          severity: "error",
-          code: "TRAIL_SITEMAP_MISSING",
-          entityId: trail.id,
-          sourceFeature: "book",
-          targetFeature: "sitemap",
-          detail: `Trail "${trail.slug}" linked from book "${book.slug}" is missing from sitemap paths.`,
         });
       }
     }
