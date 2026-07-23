@@ -7,10 +7,7 @@ import {
 } from "@/lib/books/book-overview-schema";
 import { getAllBookOverviews, getBookOverviewsManifest } from "@/lib/books/load-book-overviews";
 import { getOverviewLinkExceptions } from "@/lib/books/overview-link-exceptions";
-import {
-  assertBookOverviewsHealthy,
-  collectBookOverviewHealthIssues,
-} from "@/lib/books/validate-book-overviews";
+import { collectBookOverviewHealthIssues } from "@/lib/books/validate-book-overviews";
 import type { SemanticGraph } from "@/types/semanticGraph";
 
 const graph = semanticManifest as unknown as SemanticGraph;
@@ -30,7 +27,6 @@ describe("overview link exceptions config", () => {
 
 describe("book overview health", () => {
   it("accepts overviews from the semantic manifest against the graph", () => {
-    assertBookOverviewsHealthy({ graph });
     const issues = collectBookOverviewHealthIssues({ graph });
     expect(issues.filter((i) => i.severity === "error")).toHaveLength(0);
     expect(
