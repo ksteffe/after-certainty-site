@@ -11,7 +11,7 @@ import {
   type OverviewLinkException,
 } from "@/lib/books/overview-link-exceptions";
 import { resolveWorkEdition } from "@/lib/books/resolve-work-edition";
-import { bookOverviewsFromGraph } from "@/lib/graph/discovery";
+import { bookOverviewsFromGraph, publicationRegistryFromGraph } from "@/lib/graph/discovery";
 import type { SemanticGraph } from "@/types/semanticGraph";
 
 export type BookOverviewHealthSeverity = "error" | "warning";
@@ -49,6 +49,7 @@ export function collectBookOverviewHealthIssues(input: {
   const prioritySlugs = input.prioritySlugs ?? [...DEFAULT_BOOK_OVERVIEW_PRIORITY_SLUGS];
   const linkExceptions = input.linkExceptions ?? getOverviewLinkExceptions();
   const exceptionsBySlug = indexOverviewLinkExceptions(linkExceptions);
+  const publicationRegistry = publicationRegistryFromGraph(graph);
 
   const issues: BookOverviewHealthIssue[] = [];
   const booksById = new Map(graph.books.map((book) => [book.id, book]));
@@ -295,7 +296,7 @@ export function collectBookOverviewHealthIssues(input: {
         });
       }
 
-      const relatedEdition = resolveWorkEdition(related, graph.books);
+      const relatedEdition = resolveWorkEdition(related, graph.books, publicationRegistry);
       if (relatedEdition.relationship === "superseded") {
         issues.push({
           severity: "error",
