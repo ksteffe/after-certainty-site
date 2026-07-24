@@ -57,6 +57,8 @@ Dependabot version updates are disabled on this archived repository. Continue de
 
 ## Deployment (Vercel)
 
+Production deploys from the monorepo (`ksteffe/after-certainty`, Root Directory `apps/site`). The notes below describe the former standalone project for historical context.
+
 1. Connect the repository.
 2. Set **NEXT_PUBLIC_SITE_URL** to `https://www.after-certainty.com` in project Environment Variables.
 3. Defaults assume Node build (`next build`); output is static-first with prerendered routes.
