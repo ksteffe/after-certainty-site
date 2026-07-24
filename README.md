@@ -1,6 +1,12 @@
 # After Certainty · Site
 
-Intellectual commons surface for **After Certainty** — books metadata, podcast hub, patterns library, and collaboration entry points. Books live in separate repositories; this project consumes exported manifests and stays visually restrained (literary, cinematic, dark-first).
+> **This repository is read-only and archived.**
+>
+> Site source now lives at
+> [`ksteffe/after-certainty`](https://github.com/ksteffe/after-certainty/tree/main/apps/site)
+> (`apps/site`). Open issues and PRs against the monorepo; do not push here.
+
+Intellectual commons surface for **After Certainty** — books metadata, podcast hub, patterns library, and collaboration entry points. Active development continues in the monorepo; this tree is kept for history only.
 
 ## Stack
 
@@ -47,17 +53,7 @@ Wire real manifests by swapping JSON under `data/` or pointing loaders in `lib/c
 
 ## Dependency updates & security
 
-Keeping libraries and CI Actions current:
-
-| Mechanism                                | What it does                                                                                                                                                                                                    |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Dependabot version updates**           | Weekly PRs for npm and GitHub Actions (see `.github/dependabot.yml`). Minor/patch bumps are grouped; majors stay separate. TypeScript major upgrades are ignored until the ESLint/Next toolchain supports them. |
-| **Dependabot alerts & security updates** | Enable under GitHub → **Settings → Code security** (Dependabot alerts + Dependabot security updates). Security PRs are not controlled by `dependabot.yml`.                                                      |
-| **CI `npm audit`**                       | Fails the build on high+ severity advisories (`.github/workflows/ci.yml`).                                                                                                                                      |
-
-After merging the Dependabot config, confirm those Code security toggles are on so alerts and automatic security-fix PRs work.
-
-Optional: once **Dependency graph** is enabled in the same settings page, you can add GitHub’s [Dependency Review Action](https://github.com/actions/dependency-review-action) to fail PRs that introduce high+ severity vulnerable packages. It cannot run until that setting is on.
+Dependabot version updates are disabled on this archived repository. Continue dependency and CI maintenance in the monorepo (`ksteffe/after-certainty`). Historical CI still includes `npm audit` in `.github/workflows/ci.yml` if this tree is ever rebuilt locally.
 
 ## Deployment (Vercel)
 
